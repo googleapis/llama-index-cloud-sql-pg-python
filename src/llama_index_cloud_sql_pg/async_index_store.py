@@ -165,6 +165,9 @@ class AsyncPostgresIndexStore(BaseIndexStore):
     ) -> Optional[IndexStruct]:
         """Get an index struct.
 
+        Raises:
+            Warning: If struct_id is not provided and more than 1 struct exists and returns None.
+
         Args:
             struct_id (Optional[str]): index struct id
 

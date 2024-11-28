@@ -15,6 +15,7 @@
 import os
 import uuid
 from typing import Sequence
+import warnings
 
 import pytest
 import pytest_asyncio
@@ -23,8 +24,8 @@ from llama_index.core.schema import Document, NodeRelationship, TextNode
 from sqlalchemy import RowMapping, text
 
 from llama_index_cloud_sql_pg import PostgresEngine
-from llama_index_cloud_sql_pg.async_document_store import \
-    AsyncPostgresDocumentStore
+from llama_index_cloud_sql_pg.async_document_store import AsyncPostgresDocumentStore
+
 
 default_table_name_async = "document_store_" + str(uuid.uuid4())
 
@@ -77,7 +78,9 @@ class TestAsyncPostgresDocumentStore:
         return get_env_var("DB_PASSWORD", "database password for Cloud SQL")
 
     @pytest_asyncio.fixture(scope="class")
-    async def async_engine(self, db_project, db_region, db_instance, db_name):
+    async def async_engine(
+        self, db_project, db_region, db_instance, db_name
+    ):
         async_engine = await PostgresEngine.afrom_instance(
             project_id=db_project,
             instance=db_instance,
@@ -106,6 +109,24 @@ class TestAsyncPostgresDocumentStore:
         with pytest.raises(Exception):
             AsyncPostgresDocumentStore(
                 engine=async_engine, table_name=default_table_name_async
+            )
+
+    async def test_warning(self, async_engine):
+        # Create and add documents into the docstore with batch size set to 0.
+        document_text = "warning test doc"
+        doc = Document(
+            text=document_text, id_="warning_test_doc", metadata={"doc": "info"}
+        )
+        document_store = await AsyncPostgresDocumentStore.create(
+            engine=async_engine, table_name=default_table_name_async, batch_size=0
+        )
+
+        with warnings.catch_warnings(record=True) as w:
+            await document_store.async_add_documents([doc], batch_size=0)
+
+            assert len(w) == 1
+            assert "Provided batch size less than 1. Defaulting to 1." in str(
+                w[-1].message
             )
 
     async def test_adocs(self, doc_store):

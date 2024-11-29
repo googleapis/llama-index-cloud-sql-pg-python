@@ -28,7 +28,7 @@ from llama_index_cloud_sql_pg.async_document_store import AsyncPostgresDocumentS
 
 
 default_table_name_async = "document_store_" + str(uuid.uuid4())
-
+custom_table_name_async = "document_store_" + str(uuid.uuid4())
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:
     async with engine._pool.connect() as conn:
@@ -105,24 +105,32 @@ class TestAsyncPostgresDocumentStore:
         query = f'DROP TABLE IF EXISTS "{default_table_name_async}"'
         await aexecute(async_engine, query)
 
+    @pytest_asyncio.fixture(scope="class")
+    async def custom_doc_store(self, async_engine):
+        await async_engine._ainit_doc_store_table(table_name=custom_table_name_async)
+
+        custom_doc_store = await AsyncPostgresDocumentStore.create(
+            engine=async_engine, table_name=custom_table_name_async, batch_size=0
+        )
+        yield custom_doc_store
+
+        query = f'DROP TABLE IF EXISTS "{custom_table_name_async}"'
+        await aexecute(async_engine, query)
+
     async def test_init_with_constructor(self, async_engine):
         with pytest.raises(Exception):
             AsyncPostgresDocumentStore(
                 engine=async_engine, table_name=default_table_name_async
             )
 
-    async def test_warning(self, async_engine):
+    async def test_warning(self, custom_doc_store):
         # Create and add documents into the docstore with batch size set to 0.
         document_text = "warning test doc"
         doc = Document(
             text=document_text, id_="warning_test_doc", metadata={"doc": "info"}
         )
-        document_store = await AsyncPostgresDocumentStore.create(
-            engine=async_engine, table_name=default_table_name_async, batch_size=0
-        )
-
         with warnings.catch_warnings(record=True) as w:
-            await document_store.async_add_documents([doc], batch_size=0)
+            await custom_doc_store.async_add_documents([doc], batch_size=0)
 
             assert len(w) == 1
             assert "Provided batch size less than 1. Defaulting to 1." in str(

@@ -16,7 +16,7 @@
 set -eo pipefail
 
 # Start the releasetool reporter
-python3 -m pip install --require-hashes -r github/llama-index-alloydb-pg-python/.kokoro/requirements.txt
+python3 -m pip install --require-hashes -r github/llama-index-cloud-sql-pg-python/.kokoro/requirements.txt
 python3 -m releasetool publish-reporter-script > /tmp/publisher-script; source /tmp/publisher-script
 
 # Disable buffering, so that the logs stream through.
@@ -24,6 +24,6 @@ export PYTHONUNBUFFERED=1
 
 # Move into the package, build the distribution and upload.
 TWINE_PASSWORD=$(cat "${KOKORO_KEYSTORE_DIR}/73713_google-cloud-pypi-token-keystore-3")
-cd github/llama-index-alloydb-pg-python
+cd github/llama-index-cloud-sql-pg-python
 python3 -m build --wheel
 twine upload --username __token__ --password "${TWINE_PASSWORD}" dist/*

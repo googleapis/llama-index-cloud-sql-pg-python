@@ -28,7 +28,7 @@ python3 -m nox --version
 nox -s docs
 
 python3 -m pip install .
-VERSION=$(python3 -c "import llama_index_alloydb_pg;print(llama_index_alloydb_pg.__version__)")
+VERSION=$(python3 -c "import llama_index_cloud_sql_pg;print(llama_index_cloud_sql_pg.__version__)")
 
 # create metadata
 python3 -m docuploader create-metadata \

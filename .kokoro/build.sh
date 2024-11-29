@@ -16,7 +16,7 @@
 set -eo pipefail
 
 if [[ -z "${PROJECT_ROOT:-}" ]]; then
-    PROJECT_ROOT="github/llama-index-alloydb-pg-python"
+    PROJECT_ROOT="github/llama-index-cloud-sql-pg-python"
 fi
 
 cd "${PROJECT_ROOT}"

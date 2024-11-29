@@ -9,7 +9,6 @@ The **Cloud SQL for PostgreSQL for LlamaIndex** package provides a first class e
 Cloud SQL instances from the LlamaIndex ecosystem while providing the following benefits:
 
 - **Simplified & Secure Connections**: easily and securely create shared connection pools to connect to Google Cloud databases utilizing IAM for authorization and database authentication without needing to manage SSL certificates, configure firewall rules, or enable authorized networks.
-- **Better integration with Cloud SQL**: built-in methods to take advantage of Cloud SQL's advanced indexing and scalability capabilities.
 - **Improved metadata handling**: store metadata in columns instead of JSON, resulting in significant performance improvements.
 - **Clear separation**: clearly separate table and extension creation, allowing for distinct permissions and streamlined workflows.
 
@@ -29,12 +28,12 @@ steps:
 
 1. `Select or create a Cloud Platform project.`_
 2. `Enable billing for your project.`_
-3. `Enable the Cloud SQL API.`_
+3. `Enable the Cloud SQL Admin API.`_
 4. `Setup Authentication.`_
 
 .. _Select or create a Cloud Platform project.: https://console.cloud.google.com/project
 .. _Enable billing for your project.: https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project
-.. _Enable the Cloud SQL API.: https://console.cloud.google.com/flows/enableapi?apiid=sqladmin.googleapis.com
+.. _Enable the Cloud SQL Admin API.: https://console.cloud.google.com/flows/enableapi?apiid=sqladmin.googleapis.com
 .. _Setup Authentication.: https://googleapis.dev/python/google-api-core/latest/auth.html
 
 Installation

@@ -89,10 +89,6 @@ class TestIndexSync:
         return get_env_var("REGION", "region for Cloud SQL instance")
 
     @pytest.fixture(scope="module")
-    def db_cluster(self) -> str:
-        return get_env_var("CLUSTER_ID", "cluster for Cloud SQL")
-
-    @pytest.fixture(scope="module")
     def db_instance(self) -> str:
         return get_env_var("INSTANCE_ID", "instance for Cloud SQL")
 
@@ -109,10 +105,9 @@ class TestIndexSync:
         return get_env_var("DB_PASSWORD", "database name on Cloud SQL instance")
 
     @pytest_asyncio.fixture(scope="class")
-    async def engine(self, db_project, db_region, db_cluster, db_instance, db_name):
+    async def engine(self, db_project, db_region, db_instance, db_name):
         engine = await PostgresEngine.afrom_instance(
             project_id=db_project,
-            cluster=db_cluster,
             instance=db_instance,
             region=db_region,
             database=db_name,
@@ -180,10 +175,6 @@ class TestAsyncIndex:
         return get_env_var("REGION", "region for Cloud SQL instance")
 
     @pytest.fixture(scope="module")
-    def db_cluster(self) -> str:
-        return get_env_var("CLUSTER_ID", "cluster for Cloud SQL")
-
-    @pytest.fixture(scope="module")
     def db_instance(self) -> str:
         return get_env_var("INSTANCE_ID", "instance for Cloud SQL")
 
@@ -200,11 +191,10 @@ class TestAsyncIndex:
         return get_env_var("DB_PASSWORD", "database name on Cloud SQL instance")
 
     @pytest_asyncio.fixture(scope="class")
-    async def engine(self, db_project, db_region, db_cluster, db_instance, db_name):
+    async def engine(self, db_project, db_region, db_instance, db_name):
         engine = await PostgresEngine.afrom_instance(
             project_id=db_project,
             instance=db_instance,
-            cluster=db_cluster,
             region=db_region,
             database=db_name,
         )

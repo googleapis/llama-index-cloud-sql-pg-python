@@ -19,8 +19,7 @@ from typing import Sequence
 
 import pytest
 import pytest_asyncio
-from llama_index.core.data_structs.data_structs import (IndexDict, IndexGraph,
-                                                        IndexList)
+from llama_index.core.data_structs.data_structs import IndexDict, IndexGraph, IndexList
 from sqlalchemy import RowMapping, text
 
 from llama_index_cloud_sql_pg import PostgresEngine, PostgresIndexStore

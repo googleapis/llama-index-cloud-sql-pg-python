@@ -85,16 +85,12 @@ class TestPostgresIndexStoreAsync:
         return get_env_var("DB_PASSWORD", "database password for Cloud SQL")
 
     @pytest_asyncio.fixture(scope="class")
-    async def async_engine(
-        self, db_project, db_region, db_instance, db_name, user, password
-    ):
+    async def async_engine(self, db_project, db_region, db_instance, db_name):
         async_engine = await PostgresEngine.afrom_instance(
             project_id=db_project,
             instance=db_instance,
             region=db_region,
             database=db_name,
-            user=user,
-            password=password,
         )
 
         yield async_engine
@@ -202,16 +198,12 @@ class TestPostgresIndexStoreSync:
         return get_env_var("DB_PASSWORD", "database password for Cloud SQL")
 
     @pytest_asyncio.fixture(scope="class")
-    async def async_engine(
-        self, db_project, db_region, db_instance, db_name, user, password
-    ):
+    async def async_engine(self, db_project, db_region, db_instance, db_name):
         async_engine = PostgresEngine.from_instance(
             project_id=db_project,
             instance=db_instance,
             region=db_region,
             database=db_name,
-            user=user,
-            password=password,
         )
 
         yield async_engine

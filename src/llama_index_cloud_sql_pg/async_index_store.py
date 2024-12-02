@@ -21,8 +21,10 @@ from typing import List, Optional
 from llama_index.core.constants import DATA_KEY
 from llama_index.core.data_structs.data_structs import IndexStruct
 from llama_index.core.storage.index_store.types import BaseIndexStore
-from llama_index.core.storage.index_store.utils import (index_struct_to_json,
-                                                        json_to_index_struct)
+from llama_index.core.storage.index_store.utils import (
+    index_struct_to_json,
+    json_to_index_struct,
+)
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
@@ -164,9 +166,6 @@ class AsyncPostgresIndexStore(BaseIndexStore):
         self, struct_id: Optional[str] = None
     ) -> Optional[IndexStruct]:
         """Get an index struct.
-
-        Raises:
-            Warning: If struct_id is not provided and more than 1 struct exists and returns None.
 
         Args:
             struct_id (Optional[str]): index struct id

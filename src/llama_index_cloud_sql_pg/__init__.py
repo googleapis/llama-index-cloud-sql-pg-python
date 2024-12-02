@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_all = [
-    "__version__",
-]
+from .engine import Column, PostgresEngine
+from .version import __version__
+
+_all = ["PostgresEngine", "Column", "__version__"]

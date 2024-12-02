@@ -23,5 +23,6 @@ _all = [
     "PostgresEngine",
     "PostgresDocumentStore",
     "PostgresIndexStore",
-    "PostgresVectorStore" "__version__",
+    "PostgresVectorStore",
+    "__version__",
 ]

@@ -18,7 +18,6 @@ import pytest_asyncio
 
 @pytest.mark.asyncio
 class TestEngine:
-    @pytest_asyncio.fixture(scope="class")
     async def test_method(self):
         # TODO: implement tests
-        pass
+        assert 0 == 0

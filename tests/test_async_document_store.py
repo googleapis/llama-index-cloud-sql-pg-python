@@ -24,8 +24,7 @@ from llama_index.core.schema import Document, NodeRelationship, TextNode
 from sqlalchemy import RowMapping, text
 
 from llama_index_cloud_sql_pg import PostgresEngine
-from llama_index_cloud_sql_pg.async_document_store import \
-    AsyncPostgresDocumentStore
+from llama_index_cloud_sql_pg.async_document_store import AsyncPostgresDocumentStore
 
 default_table_name_async = "document_store_" + str(uuid.uuid4())
 custom_table_name_async = "document_store_" + str(uuid.uuid4())

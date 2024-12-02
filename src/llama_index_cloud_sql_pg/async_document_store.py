@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from llama_index.core.constants import DATA_KEY
@@ -130,6 +131,10 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         Returns:
             None
         """
+        if batch_size < 1:
+            batch_size = 1
+            warnings.warn("Provided batch size less than 1. Defaulting to 1.")
+
         for i in range(0, len(rows), batch_size):
             batch = rows[i : i + batch_size]
             params = [{"id": id, "doc_hash": doc_hash} for id, doc_hash in batch]
@@ -177,6 +182,10 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
             None
         """
         batch_size = batch_size or self._batch_size
+
+        if batch_size < 1:
+            batch_size = 1
+            warnings.warn("Provided batch size less than 1. Defaulting to 1.")
 
         node_rows = []
 

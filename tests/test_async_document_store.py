@@ -14,8 +14,8 @@
 
 import os
 import uuid
-from typing import Sequence
 import warnings
+from typing import Sequence
 
 import pytest
 import pytest_asyncio
@@ -24,11 +24,12 @@ from llama_index.core.schema import Document, NodeRelationship, TextNode
 from sqlalchemy import RowMapping, text
 
 from llama_index_cloud_sql_pg import PostgresEngine
-from llama_index_cloud_sql_pg.async_document_store import AsyncPostgresDocumentStore
-
+from llama_index_cloud_sql_pg.async_document_store import \
+    AsyncPostgresDocumentStore
 
 default_table_name_async = "document_store_" + str(uuid.uuid4())
 custom_table_name_async = "document_store_" + str(uuid.uuid4())
+
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:
     async with engine._pool.connect() as conn:
@@ -78,9 +79,7 @@ class TestAsyncPostgresDocumentStore:
         return get_env_var("DB_PASSWORD", "database password for Cloud SQL")
 
     @pytest_asyncio.fixture(scope="class")
-    async def async_engine(
-        self, db_project, db_region, db_instance, db_name
-    ):
+    async def async_engine(self, db_project, db_region, db_instance, db_name):
         async_engine = await PostgresEngine.afrom_instance(
             project_id=db_project,
             instance=db_instance,

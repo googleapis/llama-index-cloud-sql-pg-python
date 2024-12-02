@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # Trigger presubmit tests for trusted contributors
 # https://github.com/googleapis/repo-automation-bots/tree/main/packages/trusted-contribution
 # Install: https://github.com/apps/trusted-contributions-gcf

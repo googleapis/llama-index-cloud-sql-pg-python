@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .document_store import PostgresDocumentStore
 from .engine import Column, PostgresEngine
 from .index_store import PostgresIndexStore
+from .version import __version__
 
-_all = ["Column", "PostgresEngine", "PostgresIndexStore"]
+_all = ["Column", "PostgresEngine", "PostgresDocumentStore", "PostgresIndexStore", "__version__"]

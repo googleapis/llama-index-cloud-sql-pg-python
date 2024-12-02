@@ -11,8 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-
 // Dependency Update Configuration
 //
 // See https://docs.renovatebot.com/configuration-options/
@@ -26,123 +24,48 @@
     "group:allNonMajor", // https://docs.renovatebot.com/presets-group/#groupallnonmajor
     ":separateMajorReleases", // https://docs.renovatebot.com/presets-default/#separatemajorreleases
     ":prConcurrentLimitNone", // View complete backlog as PRs. https://docs.renovatebot.com/presets-default/#prconcurrentlimitnone
-    ":prNotPending", // https://docs.renovatebot.com/presets-default/#prnotpending
     ":prHourlyLimitNone", // https://docs.renovatebot.com/presets-default/#prhourlylimitnone
-    "docker:enableMajor", // https://docs.renovatebot.com/presets-docker/#dockerenablemajor
+    ":preserveSemverRanges",
   ],
-
-  // Synchronized with a 2 week sprint cycle and outside business hours.
-  // https://docs.renovatebot.com/configuration-options/#schedule
-  "schedule": ["every 2 weeks on Saturday"],
-
-  // Give ecosystem time to catch up.
-  // npm allows maintainers to unpublish a release up to 3 days later.
-  // https://docs.renovatebot.com/configuration-options/#minimumreleaseage
-  "minimumReleaseAge": "3", 
-
+  "ignorePaths": [
+    ".kokoro/**"
+  ], // Dependabot will make security updates
   // Create PRs, but do not update them without manual action.
   // Reduces spurious retesting in repositories that have many PRs at a time.
   // https://docs.renovatebot.com/configuration-options/#rebasewhen
-  "rebaseWhen": "never",
-
+  "rebaseWhen": "conflicted",
   // Organizational processes.
   // https://docs.renovatebot.com/configuration-options/#dependencydashboardlabels
   "dependencyDashboardLabels": [
     "type: process",
   ],
-  // https://docs.renovatebot.com/configuration-options/#prbodynotes
-  "prBodyNotes": [
-    "Reviewer is responsible for dependency update. Ensure adequate automated or manual testing is performed before merge.",
-  ],
-
   "packageRules": [
-    // Report impact of a dependency update via PR label.
     {
-      "matchUpdateTypes": ["patch"],
-       "addLabels": ["semver: patch"],
+      "groupName": "GitHub Actions",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "pinDigests": true,
     },
+    // Python Specific
     {
-      "matchUpdateTypes": ["minor"],
-       "addLabels": ["semver: minor"],
-    },
-    {
-      "matchUpdateTypes": ["major"],
-       "addLabels": ["semver: major"],
-    },
-
-    // Language-specific behaviors.
-    {
-      "matchLanguages": ["go"],
-      "postUpdateOptions": ["gomodTidy"],
-    },
-
-    // Tooling & Runtime behaviors.
-    {
-      // Covers Dockerfiles, cloudbuild.yaml, and other docker-based tools.
-      "groupName": "Docker Runtimes",
-      "matchDatasources": ["docker"],
-      // TODO: Uncomment if your Dockerfiles are not included in samples.
-      // Increases build repeatability, image cache use, and supply chain security.
-      // "pinDigests": true,
-    },
-    {
-       "groupName": "GitHub Actions",
-       "matchManagers": ["github-actions"],
-       "pinDigests": true,
-    },
-
-    // Language groupings.
-    // These are separated to facilitate PR review by single-language experts.
-    {
-      "groupName": "go-nonmajor",
-      "matchLanguages": ["go"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "pytest"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ]
     },
     {
       "groupName": "python-nonmajor",
-      "matchLanguages": ["python"],
-      "matchUpdateTypes": ["minor", "patch"],
-    },
-    {
-      "groupName": "java-nonmajor",
-      "matchLanguages": ["java"],
-      "matchUpdateTypes": ["minor", "patch"],
-    },
-    {
-      "groupName": "js-nonmajor",
-      "matchLanguages": ["js"],
-      "matchUpdateTypes": ["minor", "patch"],
-    },
-    {
-      "groupName": "nodejs-nonmajor",
-      "matchLanguages": ["node"],
-      "matchUpdateTypes": ["minor", "patch"],
-    },
-    {
-      "groupName": "npm-dev",
-      "matchManagers": ["npm"],
-      "matchDepTypes": ["devDependencies"],
-      "separateMajorMinor": false,
-    },
-    {
-      "groupName": "Terraform",
-      "matchManagers": ["terraform"],
-      "separateMajorMinor": false,
-    },
-
-    // Updating coupled ecosystems.
-    {
-      "groupName": "Playwright",
-      "matchPackageNames": [
-        "playwright",
-        "@playwright/test",
-        "mcr.microsoft.com/playwright",
+      "matchLanguages": [
+        "python"
       ],
-    },
-    {
-      "groupName": "OpenTelemetry",
-      "matchLanguages": ["python"],
-      "matchPackagePrefixes": ["opentelemetry-"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
     },
   ],
 }

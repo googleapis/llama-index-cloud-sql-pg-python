@@ -482,7 +482,6 @@ class TestEngineAsync:
     async def test_iam_account_override(
         self,
         db_project,
-        db_cluster,
         db_instance,
         db_region,
         db_name,

@@ -350,10 +350,6 @@ class TestEngineAsync:
         return get_env_var("REGION", "region for Cloud SQL instance")
 
     @pytest.fixture(scope="module")
-    def db_cluster(self) -> str:
-        return get_env_var("CLUSTER_ID", "cluster for Cloud SQL")
-
-    @pytest.fixture(scope="module")
     def db_instance(self) -> str:
         return get_env_var("INSTANCE_ID", "instance for Cloud SQL")
 

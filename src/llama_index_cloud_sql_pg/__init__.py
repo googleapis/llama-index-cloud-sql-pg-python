@@ -13,5 +13,6 @@
 # limitations under the License.
 
 from .engine import Column, PostgresEngine
+from .version import __version__
 
-_all = ["PostgresEngine", "Column"]
+_all = ["PostgresEngine", "Column", "__version__"]

@@ -78,10 +78,6 @@ class TestEngineAsync:
         return get_env_var("REGION", "region for Cloud SQL instance")
 
     @pytest.fixture(scope="module")
-    def db_cluster(self) -> str:
-        return get_env_var("CLUSTER_ID", "cluster for Cloud SQL")
-
-    @pytest.fixture(scope="module")
     def db_instance(self) -> str:
         return get_env_var("INSTANCE_ID", "instance for Cloud SQL")
 
@@ -219,7 +215,6 @@ class TestEngineAsync:
     async def test_iam_account_override(
         self,
         db_project,
-        db_cluster,
         db_instance,
         db_region,
         db_name,
@@ -313,10 +308,6 @@ class TestEngineSync:
         return get_env_var("REGION", "region for Cloud SQL instance")
 
     @pytest.fixture(scope="module")
-    def db_cluster(self) -> str:
-        return get_env_var("CLUSTER_ID", "cluster for Cloud SQL")
-
-    @pytest.fixture(scope="module")
     def db_instance(self) -> str:
         return get_env_var("INSTANCE_ID", "instance for Cloud SQL")
 
@@ -388,7 +379,6 @@ class TestEngineSync:
     async def test_iam_account_override(
         self,
         db_project,
-        db_cluster,
         db_instance,
         db_region,
         db_name,

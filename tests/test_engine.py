@@ -17,10 +17,6 @@ import uuid
 from typing import Sequence
 
 import asyncpg  # type: ignore
-import os
-from typing import Sequence
-
-import asyncpg  # type: ignore
 import pytest
 import pytest_asyncio
 from google.cloud.sql.connector import Connector, IPTypes
@@ -299,6 +295,8 @@ class TestEngineAsync:
         ]
         for row in results:
             assert row in expected
+
+
 from google.cloud.sql.connector import Connector, IPTypes
 from sqlalchemy import VARCHAR, text
 from sqlalchemy.engine import URL

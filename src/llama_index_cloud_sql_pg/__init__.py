@@ -14,5 +14,6 @@
 
 from .document_store import PostgresDocumentStore
 from .engine import Column, PostgresEngine
+from .version import __version__
 
-_all = ["Column", "PostgresDocumentStore", "PostgresEngine"]
+_all = ["Column", "PostgresEngine", "PostgresDocumentStore", "__version__"]

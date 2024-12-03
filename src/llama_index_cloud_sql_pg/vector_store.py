@@ -24,9 +24,9 @@ from llama_index.core.vector_stores.types import (
     VectorStoreQueryResult,
 )
 
-from .async_vector_store import AsyncPostgresVectorStore
+from .async_vector_store import AsyncPostgresVectorStore  # type: ignore
 from .engine import PostgresEngine
-from .indexes import (
+from .indexes import (  # type: ignore
     DEFAULT_DISTANCE_STRATEGY,
     BaseIndex,
     DistanceStrategy,

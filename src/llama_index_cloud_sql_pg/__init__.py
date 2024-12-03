@@ -15,6 +15,7 @@
 from .document_store import PostgresDocumentStore
 from .engine import Column, PostgresEngine
 from .index_store import PostgresIndexStore
+from .vector_store import PostgresVectorStore
 from .version import __version__
 
 _all = [
@@ -22,5 +23,6 @@ _all = [
     "PostgresEngine",
     "PostgresDocumentStore",
     "PostgresIndexStore",
+    "PostgresVectorStore",
     "__version__",
 ]

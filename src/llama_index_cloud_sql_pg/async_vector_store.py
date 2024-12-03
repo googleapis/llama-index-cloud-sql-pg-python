@@ -49,7 +49,6 @@ from .indexes import (
     DistanceStrategy,
     ExactNearestNeighbor,
     QueryOptions,
-    ScaNNIndex,
 )
 
 
@@ -406,7 +405,7 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
         )
 
     async def set_maintenance_work_mem(self, num_leaves: int, vector_size: int) -> None:
-        """Set database maintenance work memory (for ScaNN index creation)."""
+        """Set database maintenance work memory (for index creation)."""
         # Required index memory in MB
         buffer = 1
         index_memory_required = (
@@ -428,15 +427,7 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
             await self.adrop_vector_index()
             return
 
-        # Create `alloydb_scann` extension when a `ScaNN` index is applied
-        if isinstance(index, ScaNNIndex):
-            async with self._engine.connect() as conn:
-                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS alloydb_scann"))
-                await conn.commit()
-            function = index.distance_strategy.scann_index_function
-        else:
-            function = index.distance_strategy.index_function
-
+        function = index.distance_strategy.index_function
         filter = f"WHERE ({index.partial_indexes})" if index.partial_indexes else ""
         params = "WITH " + index.index_options()
         if name is None:

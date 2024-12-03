@@ -28,9 +28,9 @@ class StrategyMixin:
 class DistanceStrategy(StrategyMixin, enum.Enum):
     """Enumerator of the Distance strategies."""
 
-    EUCLIDEAN = "<->", "l2_distance", "vector_l2_ops", "l2"
-    COSINE_DISTANCE = "<=>", "cosine_distance", "vector_cosine_ops", "cosine"
-    INNER_PRODUCT = "<#>", "inner_product", "vector_ip_ops", "dot_product"
+    EUCLIDEAN = "<->", "l2_distance", "vector_l2_ops"
+    COSINE_DISTANCE = "<=>", "cosine_distance", "vector_cosine_ops"
+    INNER_PRODUCT = "<#>", "inner_product", "vector_ip_ops"
 
 
 DEFAULT_DISTANCE_STRATEGY: DistanceStrategy = DistanceStrategy.COSINE_DISTANCE

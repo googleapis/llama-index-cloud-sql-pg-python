@@ -32,7 +32,6 @@ from llama_index_cloud_sql_pg.indexes import (
     HNSWIndex,
     IVFFlatIndex,
     IVFIndex,
-    ScaNNIndex,
 )
 from llama_index_cloud_sql_pg.vector_store import PostgresVectorStore
 

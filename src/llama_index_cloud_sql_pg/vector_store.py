@@ -287,13 +287,13 @@ class PostgresVectorStore(BasePydanticVectorStore):
     async def aset_maintenance_work_mem(
         self, num_leaves: int, vector_size: int
     ) -> None:
-        """Set database maintenance work memory (for ScaNN index creation)."""
+        """Set database maintenance work memory (for index creation)."""
         await self._engine._run_as_async(
             self.__vs.set_maintenance_work_mem(num_leaves, vector_size)
         )
 
     def set_maintenance_work_mem(self, num_leaves: int, vector_size: int) -> None:
-        """Set database maintenance work memory (for ScaNN index creation)."""
+        """Set database maintenance work memory (for index creation)."""
         self._engine._run_as_sync(
             self.__vs.set_maintenance_work_mem(num_leaves, vector_size)
         )

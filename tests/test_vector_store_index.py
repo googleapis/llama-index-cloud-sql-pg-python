@@ -31,7 +31,6 @@ from llama_index_cloud_sql_pg.indexes import (  # type: ignore
     DistanceStrategy,
     HNSWIndex,
     IVFFlatIndex,
-    IVFIndex,
 )
 from llama_index_cloud_sql_pg.vector_store import PostgresVectorStore
 
@@ -249,10 +248,10 @@ class TestAsyncIndex:
         assert is_valid == False
 
     async def test_aapply_vector_index_ivf(self, vs):
-        index = IVFIndex(distance_strategy=DistanceStrategy.EUCLIDEAN)
+        index = IVFFlatIndex(distance_strategy=DistanceStrategy.EUCLIDEAN)
         await vs.aapply_vector_index(index, concurrently=True)
         assert await vs.ais_valid_index(DEFAULT_INDEX_NAME_ASYNC)
-        index = IVFIndex(
+        index = IVFFlatIndex(
             name="secondindex",
             distance_strategy=DistanceStrategy.INNER_PRODUCT,
         )

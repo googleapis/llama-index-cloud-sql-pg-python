@@ -26,7 +26,7 @@ from sqlalchemy.engine.row import RowMapping
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from llama_index_cloud_sql_pg import PostgresEngine, PostgresVectorStore
-from llama_index_cloud_sql_pg.indexes import (  # type: ignore
+from llama_index_cloud_sql_pg.indexes import (
     DEFAULT_INDEX_NAME_SUFFIX,
     DistanceStrategy,
     HNSWIndex,

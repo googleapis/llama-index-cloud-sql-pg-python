@@ -27,7 +27,10 @@ branchProtectionRules:
     requiredStatusCheckContexts:
       - "cla/google"
       - "lint"
-      - "integration-test-pr-py39 (llamaindex-cloud-sql-testing)"
+      - "pg-integration-test-pr-py39 (llamaindex-cloud-sql-testing)"
+      - "pg-integration-test-pr-py310 (llamaindex-cloud-sql-testing)"
+      - "pg-integration-test-pr-py311 (llamaindex-cloud-sql-testing)"
+      - "pg-integration-test-pr-py312 (llamaindex-cloud-sql-testing)"
       - "conventionalcommits.org"
       - "header-check"
     # - Add required status checks like presubmit tests

@@ -17,17 +17,7 @@ import asyncio
 from concurrent.futures import Future
 from dataclasses import dataclass
 from threading import Thread
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Awaitable,
-    Dict,
-    List,
-    Optional,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Awaitable, Optional, TypeVar, Union
 
 import aiohttp
 import google.auth  # type: ignore
@@ -75,7 +65,7 @@ async def _get_iam_principal_email(
     url = f"https://oauth2.googleapis.com/tokeninfo?access_token={credentials.token}"
     async with aiohttp.ClientSession() as client:
         response = await client.get(url, raise_for_status=True)
-        response_json: Dict = await response.json()
+        response_json: dict = await response.json()
         email = response_json.get("email")
     if email is None:
         raise ValueError(
@@ -511,7 +501,7 @@ class PostgresEngine:
         text_column: str = "text",
         embedding_column: str = "embedding",
         metadata_json_column: str = "li_metadata",
-        metadata_columns: List[Column] = [],
+        metadata_columns: list[Column] = [],
         ref_doc_id_column: str = "ref_doc_id",
         node_column: str = "node_data",
         stores_text: bool = True,
@@ -527,7 +517,7 @@ class PostgresEngine:
             text_column (str): Column that represent text content of a Node. Defaults to "text".
             embedding_column (str): Column for embedding vectors. The embedding is generated from the content of Node. Defaults to "embedding".
             metadata_json_column (str): Column to store metadata as JSON. Defaults to "li_metadata".
-            metadata_columns (List[str]): Column(s) that represent extracted metadata keys in their own columns.
+            metadata_columns (list[str]): Column(s) that represent extracted metadata keys in their own columns.
             ref_doc_id_column (str): Column that represents id of a node's parent document. Defaults to "ref_doc_id".
             node_column (str): Column that represents the whole JSON node. Defaults to "node_data".
             stores_text (bool): Whether the table stores text. Defaults to "True".
@@ -584,7 +574,7 @@ class PostgresEngine:
         text_column: str = "text",
         embedding_column: str = "embedding",
         metadata_json_column: str = "li_metadata",
-        metadata_columns: List[Column] = [],
+        metadata_columns: list[Column] = [],
         ref_doc_id_column: str = "ref_doc_id",
         node_column: str = "node_data",
         stores_text: bool = True,
@@ -600,7 +590,7 @@ class PostgresEngine:
             text_column (str): Column that represent text content of a Node. Defaults to "text".
             embedding_column (str): Column for embedding vectors. The embedding is generated from the content of Node. Defaults to "embedding".
             metadata_json_column (str): Column to store metadata as JSON. Defaults to "li_metadata".
-            metadata_columns (List[str]): Column(s) that represent extracted metadata keys in their own columns.
+            metadata_columns (list[str]): Column(s) that represent extracted metadata keys in their own columns.
             ref_doc_id_column (str): Column that represents id of a node's parent document. Defaults to "ref_doc_id".
             node_column (str): Column that represents the whole JSON node. Defaults to "node_data".
             stores_text (bool): Whether the table stores text. Defaults to "True".
@@ -635,7 +625,7 @@ class PostgresEngine:
         text_column: str = "text",
         embedding_column: str = "embedding",
         metadata_json_column: str = "li_metadata",
-        metadata_columns: List[Column] = [],
+        metadata_columns: list[Column] = [],
         ref_doc_id_column: str = "ref_doc_id",
         node_column: str = "node_data",
         stores_text: bool = True,
@@ -651,7 +641,7 @@ class PostgresEngine:
             text_column (str): Column that represent text content of a Node. Defaults to "text".
             embedding_column (str): Column for embedding vectors. The embedding is generated from the content of Node. Defaults to "embedding".
             metadata_json_column (str): Column to store metadata as JSON. Defaults to "li_metadata".
-            metadata_columns (List[str]): Column(s) that represent extracted metadata keys in their own columns.
+            metadata_columns (list[str]): Column(s) that represent extracted metadata keys in their own columns.
             ref_doc_id_column (str): Column that represents id of a node's parent document. Defaults to "ref_doc_id".
             node_column (str): Column that represents the whole JSON node. Defaults to "node_data".
             stores_text (bool): Whether the table stores text. Defaults to "True".

@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Sequence, Type
+from typing import Optional, Sequence
 
 from llama_index.core.schema import BaseNode
 from llama_index.core.storage.docstore import BaseDocumentStore
@@ -55,7 +55,7 @@ class PostgresDocumentStore(BaseDocumentStore):
 
     @classmethod
     async def create(
-        cls: Type[PostgresDocumentStore],
+        cls: type[PostgresDocumentStore],
         engine: PostgresEngine,
         table_name: str,
         schema_name: str = "public",
@@ -83,7 +83,7 @@ class PostgresDocumentStore(BaseDocumentStore):
 
     @classmethod
     def create_sync(
-        cls: Type[PostgresDocumentStore],
+        cls: type[PostgresDocumentStore],
         engine: PostgresEngine,
         table_name: str,
         schema_name: str = "public",
@@ -110,11 +110,11 @@ class PostgresDocumentStore(BaseDocumentStore):
         return cls(cls.__create_key, engine, document_store)
 
     @property
-    def docs(self) -> Dict[str, BaseNode]:
+    def docs(self) -> dict[str, BaseNode]:
         """Get all documents.
 
         Returns:
-            Dict[str, BaseDocument]: documents
+            dict[str, BaseDocument]: documents
 
         """
         return self._engine._run_as_sync(self.__document_store.adocs)
@@ -291,11 +291,11 @@ class PostgresDocumentStore(BaseDocumentStore):
             self.__document_store.aset_document_hash(doc_id, doc_hash)
         )
 
-    async def aset_document_hashes(self, doc_hashes: Dict[str, str]) -> None:
+    async def aset_document_hashes(self, doc_hashes: dict[str, str]) -> None:
         """Set the hash for a given doc_id.
 
         Args:
-            doc_hashes (Dict[str, str]): Dictionary with doc_id as key and doc_hash as value.
+            doc_hashes (dict[str, str]): Dictionary with doc_id as key and doc_hash as value.
 
         Returns:
             None
@@ -304,11 +304,11 @@ class PostgresDocumentStore(BaseDocumentStore):
             self.__document_store.aset_document_hashes(doc_hashes)
         )
 
-    def set_document_hashes(self, doc_hashes: Dict[str, str]) -> None:
+    def set_document_hashes(self, doc_hashes: dict[str, str]) -> None:
         """Set the hash for a given doc_id.
 
         Args:
-            doc_hashes (Dict[str, str]): Dictionary with doc_id as key and doc_hash as value.
+            doc_hashes (dict[str, str]): Dictionary with doc_id as key and doc_hash as value.
 
         Returns:
             None
@@ -343,11 +343,11 @@ class PostgresDocumentStore(BaseDocumentStore):
             self.__document_store.aget_document_hash(doc_id)
         )
 
-    async def aget_all_document_hashes(self) -> Dict[str, str]:
+    async def aget_all_document_hashes(self) -> dict[str, str]:
         """Get the stored hash for all documents.
 
         Returns:
-            Dict[
+            dict[
               str,   # doc_hash
               str    # doc_id
             ]
@@ -356,11 +356,11 @@ class PostgresDocumentStore(BaseDocumentStore):
             self.__document_store.aget_all_document_hashes()
         )
 
-    def get_all_document_hashes(self) -> Dict[str, str]:
+    def get_all_document_hashes(self) -> dict[str, str]:
         """Get the stored hash for all documents.
 
         Returns:
-            Dict[
+            dict[
               str,   # doc_hash
               str    # doc_id
             ]
@@ -369,12 +369,12 @@ class PostgresDocumentStore(BaseDocumentStore):
             self.__document_store.aget_all_document_hashes()
         )
 
-    async def aget_all_ref_doc_info(self) -> Optional[Dict[str, RefDocInfo]]:
+    async def aget_all_ref_doc_info(self) -> Optional[dict[str, RefDocInfo]]:
         """Get a mapping of ref_doc_id -> RefDocInfo for all ingested documents.
 
         Returns:
             Optional[
-              Dict[
+              dict[
                 str,          #Ref_doc_id
                 RefDocInfo,   #Ref_doc_info of the id
               ]
@@ -384,12 +384,12 @@ class PostgresDocumentStore(BaseDocumentStore):
             self.__document_store.aget_all_ref_doc_info()
         )
 
-    def get_all_ref_doc_info(self) -> Optional[Dict[str, RefDocInfo]]:
+    def get_all_ref_doc_info(self) -> Optional[dict[str, RefDocInfo]]:
         """Get a mapping of ref_doc_id -> RefDocInfo for all ingested documents.
 
         Returns:
             Optional[
-              Dict[
+              dict[
                 str,          #Ref_doc_id
                 RefDocInfo,   #Ref_doc_info of the id
               ]

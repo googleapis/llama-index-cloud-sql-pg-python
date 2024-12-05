@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, Sequence, Type
+from typing import Any, Optional, Sequence
 
 from llama_index.core.schema import BaseNode
 from llama_index.core.vector_stores.types import (
@@ -71,7 +71,7 @@ class PostgresVectorStore(BasePydanticVectorStore):
 
     @classmethod
     async def create(
-        cls: Type[PostgresVectorStore],
+        cls: type[PostgresVectorStore],
         engine: PostgresEngine,
         table_name: str,
         schema_name: str = "public",
@@ -79,7 +79,7 @@ class PostgresVectorStore(BasePydanticVectorStore):
         text_column: str = "text",
         embedding_column: str = "embedding",
         metadata_json_column: str = "li_metadata",
-        metadata_columns: List[str] = [],
+        metadata_columns: list[str] = [],
         ref_doc_id_column: str = "ref_doc_id",
         node_column: str = "node_data",
         stores_text: bool = True,
@@ -97,7 +97,7 @@ class PostgresVectorStore(BasePydanticVectorStore):
             text_column (str): Column that represent text content of a Node. Defaults to "text".
             embedding_column (str): Column for embedding vectors. The embedding is generated from the content of Node. Defaults to "embedding".
             metadata_json_column (str): Column to store metadata as JSON. Defaults to "li_metadata".
-            metadata_columns (List[str]): Column(s) that represent extracted metadata keys in their own columns.
+            metadata_columns (list[str]): Column(s) that represent extracted metadata keys in their own columns.
             ref_doc_id_column (str): Column that represents id of a node's parent document. Defaults to "ref_doc_id".
             node_column (str): Column that represents the whole JSON node. Defaults to "node_data".
             stores_text (bool): Whether the table stores text. Defaults to "True".
@@ -138,7 +138,7 @@ class PostgresVectorStore(BasePydanticVectorStore):
 
     @classmethod
     def create_sync(
-        cls: Type[PostgresVectorStore],
+        cls: type[PostgresVectorStore],
         engine: PostgresEngine,
         table_name: str,
         schema_name: str = "public",
@@ -146,7 +146,7 @@ class PostgresVectorStore(BasePydanticVectorStore):
         text_column: str = "text",
         embedding_column: str = "embedding",
         metadata_json_column: str = "li_metadata",
-        metadata_columns: List[str] = [],
+        metadata_columns: list[str] = [],
         ref_doc_id_column: str = "ref_doc_id",
         node_column: str = "node_data",
         stores_text: bool = True,
@@ -164,7 +164,7 @@ class PostgresVectorStore(BasePydanticVectorStore):
             text_column (str): Column that represent text content of a Node. Defaults to "text".
             embedding_column (str): Column for embedding vectors. The embedding is generated from the content of Node. Defaults to "embedding".
             metadata_json_column (str): Column to store metadata as JSON. Defaults to "li_metadata".
-            metadata_columns (List[str]): Column(s) that represent extracted metadata keys in their own columns.
+            metadata_columns (list[str]): Column(s) that represent extracted metadata keys in their own columns.
             ref_doc_id_column (str): Column that represents id of a node's parent document. Defaults to "ref_doc_id".
             node_column (str): Column that represents the whole JSON node. Defaults to "node_data".
             stores_text (bool): Whether the table stores text. Defaults to "True".
@@ -212,11 +212,11 @@ class PostgresVectorStore(BasePydanticVectorStore):
         """Get client."""
         return self._engine
 
-    async def async_add(self, nodes: Sequence[BaseNode], **kwargs: Any) -> List[str]:
+    async def async_add(self, nodes: Sequence[BaseNode], **kwargs: Any) -> list[str]:
         """Asynchronously add nodes to the table."""
         return await self._engine._run_as_async(self.__vs.async_add(nodes, **kwargs))
 
-    def add(self, nodes: Sequence[BaseNode], **add_kwargs: Any) -> List[str]:
+    def add(self, nodes: Sequence[BaseNode], **add_kwargs: Any) -> list[str]:
         """Synchronously add nodes to the table."""
         return self._engine._run_as_sync(self.__vs.async_add(nodes, **add_kwargs))
 
@@ -230,7 +230,7 @@ class PostgresVectorStore(BasePydanticVectorStore):
 
     async def adelete_nodes(
         self,
-        node_ids: Optional[List[str]] = None,
+        node_ids: Optional[list[str]] = None,
         filters: Optional[MetadataFilters] = None,
         **delete_kwargs: Any,
     ) -> None:
@@ -241,7 +241,7 @@ class PostgresVectorStore(BasePydanticVectorStore):
 
     def delete_nodes(
         self,
-        node_ids: Optional[List[str]] = None,
+        node_ids: Optional[list[str]] = None,
         filters: Optional[MetadataFilters] = None,
         **delete_kwargs: Any,
     ) -> None:
@@ -260,17 +260,17 @@ class PostgresVectorStore(BasePydanticVectorStore):
 
     async def aget_nodes(
         self,
-        node_ids: Optional[List[str]] = None,
+        node_ids: Optional[list[str]] = None,
         filters: Optional[MetadataFilters] = None,
-    ) -> List[BaseNode]:
+    ) -> list[BaseNode]:
         """Asynchronously get nodes from the table matching the provided nodes and filters."""
         return await self._engine._run_as_async(self.__vs.aget_nodes(node_ids, filters))
 
     def get_nodes(
         self,
-        node_ids: Optional[List[str]] = None,
+        node_ids: Optional[list[str]] = None,
         filters: Optional[MetadataFilters] = None,
-    ) -> List[BaseNode]:
+    ) -> list[BaseNode]:
         """Asynchronously get nodes from the table matching the provided nodes and filters."""
         return self._engine._run_as_sync(self.__vs.aget_nodes(node_ids, filters))
 

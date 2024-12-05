@@ -14,7 +14,7 @@
 
 import os
 import uuid
-from typing import List, Sequence
+from typing import Sequence
 
 import pytest
 import pytest_asyncio

@@ -16,9 +16,8 @@ from __future__ import annotations
 
 import json
 import warnings
-from typing import List, Optional
+from typing import Optional
 
-from llama_index.core.constants import DATA_KEY
 from llama_index.core.data_structs.data_structs import IndexStruct
 from llama_index.core.storage.index_store.types import BaseIndexStore
 from llama_index.core.storage.index_store.utils import (
@@ -113,11 +112,11 @@ class AsyncPostgresIndexStore(BaseIndexStore):
             await conn.commit()
         return results
 
-    async def aindex_structs(self) -> List[IndexStruct]:
+    async def aindex_structs(self) -> list[IndexStruct]:
         """Get all index structs.
 
         Returns:
-            List[IndexStruct]: index structs
+            list[IndexStruct]: index structs
 
         """
         query = f"""SELECT * from "{self._schema_name}"."{self._table_name}";"""
@@ -190,7 +189,7 @@ class AsyncPostgresIndexStore(BaseIndexStore):
                 return json_to_index_struct(index_data)
             return None
 
-    def index_structs(self) -> List[IndexStruct]:
+    def index_structs(self) -> list[IndexStruct]:
         raise NotImplementedError(
             "Sync methods are not implemented for AsyncPostgresIndexStore . Use PostgresIndexStore  interface instead."
         )

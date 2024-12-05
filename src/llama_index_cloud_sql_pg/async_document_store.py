@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 import warnings
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Optional, Sequence
 
 from llama_index.core.constants import DATA_KEY
 from llama_index.core.schema import BaseNode
@@ -119,13 +119,13 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         return results
 
     async def _put_all_doc_hashes_to_table(
-        self, rows: List[Tuple[str, str]], batch_size: int = int(DEFAULT_BATCH_SIZE)
+        self, rows: list[tuple[str, str]], batch_size: int = int(DEFAULT_BATCH_SIZE)
     ) -> None:
         """Puts a multiple rows of node ids with their doc_hash into the document table.
         Incase a row with the id already exists, it updates the row with the new doc_hash.
 
         Args:
-            rows (List[Tuple[str, str]]): List of tuples of id and doc_hash
+            rows (list[tuple[str, str]]): List of tuples of id and doc_hash
             batch_size (int): batch_size to insert the rows. Defaults to 1.
 
         Returns:
@@ -173,7 +173,7 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         """Adds a document to the store.
 
         Args:
-            docs (List[BaseDocument]): documents
+            docs (list[BaseDocument]): documents
             allow_update (bool): allow update of docstore from document
             batch_size (int): batch_size to insert the rows. Defaults to 1.
             store_text (bool): allow the text content of the node to stored.
@@ -225,11 +225,11 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
             await self.__aexecute_query(query, batch)
 
     @property
-    async def adocs(self) -> Dict[str, BaseNode]:
+    async def adocs(self) -> dict[str, BaseNode]:
         """Get all documents.
 
         Returns:
-            Dict[str, BaseDocument]: documents
+            dict[str, BaseDocument]: documents
         """
         query = f"""SELECT * from "{self._schema_name}"."{self._table_name}";"""
         list_docs = await self.__afetch_query(query)
@@ -300,12 +300,12 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
 
         return RefDocInfo(node_ids=node_ids, metadata=merged_metadata)
 
-    async def aget_all_ref_doc_info(self) -> Optional[Dict[str, RefDocInfo]]:
+    async def aget_all_ref_doc_info(self) -> Optional[dict[str, RefDocInfo]]:
         """Get a mapping of ref_doc_id -> RefDocInfo for all ingested documents.
 
         Returns:
             Optional[
-              Dict[
+              dict[
                 str,          #Ref_doc_id
                 RefDocInfo,   #Ref_doc_info of the id
               ]
@@ -356,14 +356,14 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
 
     async def _get_ref_doc_child_node_ids(
         self, ref_doc_id: str
-    ) -> Optional[Dict[str, List[str]]]:
+    ) -> Optional[dict[str, list[str]]]:
         """Helper function to find the child node mappings of a ref_doc_id.
 
         Returns:
             Optional[
-              Dict[
+              dict[
                 str,    # Ref_doc_id
-                List    # List of all nodes that refer to ref_doc_id
+                list    # List of all nodes that refer to ref_doc_id
               ]
             ]"""
         query = f"""select id from "{self._schema_name}"."{self._table_name}" where ref_doc_id = '{ref_doc_id}';"""
@@ -442,11 +442,11 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
 
         await self._put_all_doc_hashes_to_table(rows=[(doc_id, doc_hash)])
 
-    async def aset_document_hashes(self, doc_hashes: Dict[str, str]) -> None:
+    async def aset_document_hashes(self, doc_hashes: dict[str, str]) -> None:
         """Set the hash for a given doc_id.
 
         Args:
-            doc_hashes (Dict[str, str]): Dictionary with doc_id as key and doc_hash as value.
+            doc_hashes (dict[str, str]): Dictionary with doc_id as key and doc_hash as value.
 
         Returns:
             None
@@ -473,11 +473,11 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         else:
             return None
 
-    async def aget_all_document_hashes(self) -> Dict[str, str]:
+    async def aget_all_document_hashes(self) -> dict[str, str]:
         """Get the stored hash for all documents.
 
         Returns:
-            Dict[
+            dict[
               str,   # doc_hash
               str    # doc_id
             ]
@@ -498,11 +498,11 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         return hashes
 
     @property
-    def docs(self) -> Dict[str, BaseNode]:
+    def docs(self) -> dict[str, BaseNode]:
         """Get all documents.
 
         Returns:
-            Dict[str, BaseDocument]: documents
+            dict[str, BaseDocument]: documents
 
         """
         raise NotImplementedError(
@@ -547,7 +547,7 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
             "Sync methods are not implemented for AsyncPostgresDocumentStore. Use PostgresDocumentStore  interface instead."
         )
 
-    def set_document_hashes(self, doc_hashes: Dict[str, str]) -> None:
+    def set_document_hashes(self, doc_hashes: dict[str, str]) -> None:
         raise NotImplementedError(
             "Sync methods are not implemented for AsyncPostgresDocumentStore. Use PostgresDocumentStore  interface instead."
         )
@@ -557,12 +557,12 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
             "Sync methods are not implemented for AsyncPostgresDocumentStore. Use PostgresDocumentStore  interface instead."
         )
 
-    def get_all_document_hashes(self) -> Dict[str, str]:
+    def get_all_document_hashes(self) -> dict[str, str]:
         raise NotImplementedError(
             "Sync methods are not implemented for AsyncPostgresDocumentStore. Use PostgresDocumentStore  interface instead."
         )
 
-    def get_all_ref_doc_info(self) -> Optional[Dict[str, RefDocInfo]]:
+    def get_all_ref_doc_info(self) -> Optional[dict[str, RefDocInfo]]:
         raise NotImplementedError(
             "Sync methods are not implemented for AsyncPostgresDocumentStore. Use PostgresDocumentStore  interface instead."
         )

@@ -15,13 +15,11 @@
 
 import os
 import uuid
-from typing import List, Sequence
 
 import pytest
 import pytest_asyncio
-from llama_index.core.schema import MetadataMode, NodeRelationship, TextNode
+from llama_index.core.schema import TextNode
 from sqlalchemy import text
-from sqlalchemy.engine.row import RowMapping
 
 from llama_index_cloud_sql_pg import PostgresEngine
 from llama_index_cloud_sql_pg.async_vector_store import AsyncPostgresVectorStore

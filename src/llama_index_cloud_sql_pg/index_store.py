@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Optional
 
 from llama_index.core.data_structs.data_structs import IndexStruct
 from llama_index.core.storage.index_store.types import BaseIndexStore
@@ -96,20 +96,20 @@ class PostgresIndexStore(BaseIndexStore):
         index_store = engine._run_as_sync(coro)
         return cls(cls.__create_key, engine, index_store)
 
-    async def aindex_structs(self) -> List[IndexStruct]:
+    async def aindex_structs(self) -> list[IndexStruct]:
         """Get all index structs.
 
         Returns:
-            List[IndexStruct]: index structs
+            list[IndexStruct]: index structs
 
         """
         return await self._engine._run_as_async(self.__index_store.aindex_structs())
 
-    def index_structs(self) -> List[IndexStruct]:
+    def index_structs(self) -> list[IndexStruct]:
         """Get all index structs.
 
         Returns:
-            List[IndexStruct]: index structs
+            list[IndexStruct]: index structs
 
         """
         return self._engine._run_as_sync(self.__index_store.aindex_structs())

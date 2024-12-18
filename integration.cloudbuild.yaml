@@ -46,7 +46,7 @@ steps:
       - "-c"
       - |
         /workspace/cloud-sql-proxy ${_INSTANCE_CONNECTION_NAME} --port $_DATABASE_PORT  & sleep 2;
-        python -m pytest tests/
+        python -m pytest --cov=llama_index_cloud_sql_pg --cov-config=.coveragerc tests/
 
 availableSecrets:
   secretManager:

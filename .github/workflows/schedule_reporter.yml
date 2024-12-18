@@ -20,6 +20,6 @@ on:
 
 jobs:
   run_reporter:
-    uses: ./.github/workflows/cloud_build_failure_reporter.yml
+    uses: googleapis/langchain-google-alloydb-pg-python/.github/workflows/cloud_build_failure_reporter.yml@main
     with:
       trigger_names: "integration-test-nightly,continuous-test-on-merge"

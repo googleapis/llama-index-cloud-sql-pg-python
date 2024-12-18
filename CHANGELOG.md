@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.1.0...v0.1.1) (2024-12-05)
+
+
+### Bug Fixes
+
+* **deps:** Update python-nonmajor ([#22](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/22)) ([47fef5f](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/47fef5fec26260a2144450f8d76f68956ebc01d2))
+
 ## 0.1.0 (2024-12-03)
 
 

@@ -26,7 +26,7 @@ from llama_index_cloud_sql_pg import PostgresEngine
 from llama_index_cloud_sql_pg.async_index_store import AsyncPostgresIndexStore
 
 default_table_name_async = "index_store_" + str(uuid.uuid4())
-sync_method_exception_str = "Sync methods are not implemented for AsyncAlloyDBIndexStore . Use AlloyDBIndexStore  interface instead."
+sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresIndexStore . Use PostgresIndexStore  interface instead."
 
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:

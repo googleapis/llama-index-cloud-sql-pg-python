@@ -28,7 +28,7 @@ from llama_index_cloud_sql_pg.async_document_store import AsyncPostgresDocumentS
 
 default_table_name_async = "document_store_" + str(uuid.uuid4())
 custom_table_name_async = "document_store_" + str(uuid.uuid4())
-sync_method_exception_str = "Sync methods are not implemented for AsyncAlloyDBDocumentStore. Use AlloyDBDocumentStore  interface instead."
+sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresDocumentStore. Use PostgresDocumentStore  interface instead."
 
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:

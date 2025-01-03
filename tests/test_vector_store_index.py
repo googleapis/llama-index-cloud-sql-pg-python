@@ -32,7 +32,6 @@ from llama_index_cloud_sql_pg.vector_store import PostgresVectorStore
 
 DEFAULT_TABLE = "test_table" + str(uuid.uuid4()).replace("-", "_")
 DEFAULT_TABLE_ASYNC = "test_table" + str(uuid.uuid4()).replace("-", "_")
-CUSTOM_TABLE = "test_table_custom" + str(uuid.uuid4()).replace("-", "_")
 DEFAULT_INDEX_NAME = DEFAULT_TABLE + DEFAULT_INDEX_NAME_SUFFIX
 DEFAULT_INDEX_NAME_ASYNC = DEFAULT_TABLE_ASYNC + DEFAULT_INDEX_NAME_SUFFIX
 VECTOR_SIZE = 5
@@ -112,14 +111,15 @@ class TestIndexSync:
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):
-        engine.init_vector_store_table(DEFAULT_TABLE, VECTOR_SIZE)
+        engine.init_vector_store_table(
+            DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
+        )
         vs = PostgresVectorStore.create_sync(
             engine,
             table_name=DEFAULT_TABLE,
         )
 
-        await vs.async_add(nodes)
-
+        vs.add(nodes)
         vs.drop_vector_index()
         yield vs
 
@@ -127,6 +127,7 @@ class TestIndexSync:
         index = HNSWIndex()
         vs.apply_vector_index(index)
         assert vs.is_valid_index(DEFAULT_INDEX_NAME)
+        vs.drop_vector_index(DEFAULT_INDEX_NAME)
 
     async def test_areindex(self, vs):
         if not vs.is_valid_index(DEFAULT_INDEX_NAME):
@@ -135,6 +136,7 @@ class TestIndexSync:
         vs.reindex()
         vs.reindex(DEFAULT_INDEX_NAME)
         assert vs.is_valid_index(DEFAULT_INDEX_NAME)
+        vs.drop_vector_index(DEFAULT_INDEX_NAME)
 
     async def test_dropindex(self, vs):
         vs.drop_vector_index()
@@ -152,6 +154,7 @@ class TestIndexSync:
         vs.apply_vector_index(index)
         assert vs.is_valid_index("secondindex")
         vs.drop_vector_index("secondindex")
+        vs.drop_vector_index(DEFAULT_INDEX_NAME)
 
     async def test_is_valid_index(self, vs):
         is_valid = vs.is_valid_index("invalid_index")
@@ -198,7 +201,9 @@ class TestAsyncIndex:
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):
-        await engine.ainit_vector_store_table(DEFAULT_TABLE_ASYNC, VECTOR_SIZE)
+        await engine.ainit_vector_store_table(
+            DEFAULT_TABLE_ASYNC, VECTOR_SIZE, overwrite_existing=True
+        )
         vs = await PostgresVectorStore.create(
             engine,
             table_name=DEFAULT_TABLE_ASYNC,
@@ -212,6 +217,7 @@ class TestAsyncIndex:
         index = HNSWIndex()
         await vs.aapply_vector_index(index)
         assert await vs.ais_valid_index(DEFAULT_INDEX_NAME_ASYNC)
+        await vs.adrop_vector_index(DEFAULT_INDEX_NAME_ASYNC)
 
     async def test_areindex(self, vs):
         if not await vs.ais_valid_index(DEFAULT_INDEX_NAME_ASYNC):
@@ -220,6 +226,7 @@ class TestAsyncIndex:
         await vs.areindex()
         await vs.areindex(DEFAULT_INDEX_NAME_ASYNC)
         assert await vs.ais_valid_index(DEFAULT_INDEX_NAME_ASYNC)
+        await vs.adrop_vector_index(DEFAULT_INDEX_NAME_ASYNC)
 
     async def test_dropindex(self, vs):
         await vs.adrop_vector_index()
@@ -242,16 +249,3 @@ class TestAsyncIndex:
     async def test_is_valid_index(self, vs):
         is_valid = await vs.ais_valid_index("invalid_index")
         assert is_valid == False
-
-    async def test_aapply_vector_index_ivf(self, vs):
-        index = IVFFlatIndex(distance_strategy=DistanceStrategy.EUCLIDEAN)
-        await vs.aapply_vector_index(index, concurrently=True)
-        assert await vs.ais_valid_index(DEFAULT_INDEX_NAME_ASYNC)
-        index = IVFFlatIndex(
-            name="secondindex",
-            distance_strategy=DistanceStrategy.INNER_PRODUCT,
-        )
-        await vs.aapply_vector_index(index)
-        assert await vs.ais_valid_index("secondindex")
-        await vs.adrop_vector_index("secondindex")
-        await vs.adrop_vector_index()

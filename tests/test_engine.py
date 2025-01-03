@@ -349,7 +349,6 @@ class TestEngineSync:
         self,
         db_project,
         db_region,
-        db_cluster,
         db_instance,
         db_name,
         user,
@@ -357,7 +356,7 @@ class TestEngineSync:
     ):
         async def getconn() -> asyncpg.Connection:
             conn = await connector.connect_async(  # type: ignore
-                f"projects/{db_project}/locations/{db_region}/clusters/{db_cluster}/instances/{db_instance}",
+                f"{db_project}:{db_region}:{db_instance}",
                 "asyncpg",
                 user=user,
                 password=password,
@@ -380,7 +379,6 @@ class TestEngineSync:
         self,
         db_project,
         db_region,
-        db_cluster,
         db_instance,
         db_name,
         user,
@@ -391,7 +389,6 @@ class TestEngineSync:
                 project_id=db_project,
                 instance=db_instance,
                 region=db_region,
-                cluster=db_cluster,
                 database=db_name,
                 user=user,
             )
@@ -400,7 +397,6 @@ class TestEngineSync:
                 project_id=db_project,
                 instance=db_instance,
                 region=db_region,
-                cluster=db_cluster,
                 database=db_name,
                 password=password,
             )

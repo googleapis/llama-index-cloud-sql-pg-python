@@ -133,7 +133,7 @@ class TestPostgresDocumentStoreAsync:
         query = f"""select * from "public"."{default_table_name_async}" where id = '{doc.doc_id}';"""
         results = await afetch(async_engine, query)
         result = results[0]
-        assert result["node_data"][DATA_KEY]["text"] == document_text
+        assert result["node_data"][DATA_KEY]["text_resource"]["text"] == document_text
 
     async def test_add_hash_before_data(self, async_engine, doc_store):
         # Create a document
@@ -150,7 +150,7 @@ class TestPostgresDocumentStoreAsync:
         query = f"""select * from "public"."{default_table_name_async}" where id = '{doc.doc_id}';"""
         results = await afetch(async_engine, query)
         result = results[0]
-        assert result["node_data"][DATA_KEY]["text"] == document_text
+        assert result["node_data"][DATA_KEY]["text_resource"]["text"] == document_text
 
     async def test_ref_doc_exists(self, doc_store):
         # Create a ref_doc & a doc and add them to the store.
@@ -431,7 +431,7 @@ class TestPostgresDocumentStoreSync:
         query = f"""select * from "public"."{default_table_name_sync}" where id = '{doc.doc_id}';"""
         results = await afetch(sync_engine, query)
         result = results[0]
-        assert result["node_data"][DATA_KEY]["text"] == document_text
+        assert result["node_data"][DATA_KEY]["text_resource"]["text"] == document_text
 
     async def test_add_hash_before_data(self, sync_engine, sync_doc_store):
         # Create a document
@@ -448,7 +448,7 @@ class TestPostgresDocumentStoreSync:
         query = f"""select * from "public"."{default_table_name_sync}" where id = '{doc.doc_id}';"""
         results = await afetch(sync_engine, query)
         result = results[0]
-        assert result["node_data"][DATA_KEY]["text"] == document_text
+        assert result["node_data"][DATA_KEY]["text_resource"]["text"] == document_text
 
     async def test_ref_doc_exists(self, sync_doc_store):
         # Create a ref_doc & a doc and add them to the store.

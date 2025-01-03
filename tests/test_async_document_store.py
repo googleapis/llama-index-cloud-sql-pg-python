@@ -28,6 +28,7 @@ from llama_index_cloud_sql_pg.async_document_store import AsyncPostgresDocumentS
 
 default_table_name_async = "document_store_" + str(uuid.uuid4())
 custom_table_name_async = "document_store_" + str(uuid.uuid4())
+sync_method_exception_str = "Sync methods are not implemented for AsyncAlloyDBDocumentStore. Use AlloyDBDocumentStore  interface instead."
 
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:
@@ -116,9 +117,16 @@ class TestAsyncPostgresDocumentStore:
         await aexecute(async_engine, query)
 
     async def test_init_with_constructor(self, async_engine):
+        key = object()
         with pytest.raises(Exception):
             AsyncPostgresDocumentStore(
-                engine=async_engine, table_name=default_table_name_async
+                key, engine=async_engine, table_name=default_table_name_async
+            )
+
+    async def test_create_without_table(self, async_engine):
+        with pytest.raises(ValueError):
+            await AsyncPostgresDocumentStore.create(
+                engine=async_engine, table_name="non-existent-table"
             )
 
     async def test_warning(self, custom_doc_store):
@@ -178,7 +186,7 @@ class TestAsyncPostgresDocumentStore:
         result = results[0]
         assert result["node_data"][DATA_KEY]["text_resource"]["text"] == document_text
 
-    async def test_ref_doc_exists(self, doc_store):
+    async def test_aref_doc_exists(self, doc_store):
         # Create a ref_doc & a doc and add them to the store.
         ref_doc = Document(
             text="first doc", id_="doc_exists_doc_1", metadata={"doc": "info"}
@@ -235,6 +243,8 @@ class TestAsyncPostgresDocumentStore:
         assert (
             await doc_store.aget_document(doc_id=doc.doc_id, raise_error=False) is None
         )
+        # Confirm deleting an non-existent reference doc returns None.
+        assert await doc_store.adelete_ref_doc(ref_doc_id=ref_doc.doc_id) is None
 
     async def test_set_and_get_document_hash(self, doc_store):
         # Set a doc hash for a document
@@ -244,6 +254,9 @@ class TestAsyncPostgresDocumentStore:
 
         # Assert with get that the hash is same as the one set.
         assert await doc_store.aget_document_hash(doc_id=doc_id) == doc_hash
+
+    async def test_aget_document_hash(self, doc_store):
+        assert await doc_store.aget_document_hash(doc_id="non-existent-doc") is None
 
     async def test_set_and_get_document_hashes(self, doc_store):
         # Create a dictionary of doc_id -> doc_hash mappings and add it to the table.
@@ -279,7 +292,7 @@ class TestAsyncPostgresDocumentStore:
         retrieved_node = await doc_store.aget_document(doc_id=node.node_id)
         assert retrieved_node == node
 
-    async def test_delete_document(self, async_engine, doc_store):
+    async def test_adelete_document(self, async_engine, doc_store):
         # Create a doc and add it to the store.
         doc = Document(text="document_2", id_="doc_id_2", metadata={"doc": "info"})
         await doc_store.async_add_documents([doc])
@@ -291,6 +304,11 @@ class TestAsyncPostgresDocumentStore:
         query = f"""select * from "public"."{default_table_name_async}" where id = '{doc.doc_id}';"""
         result = await afetch(async_engine, query)
         assert len(result) == 0
+
+    async def test_delete_non_existent_document(self, doc_store):
+        await doc_store.adelete_document(doc_id="non-existent-doc", raise_error=False)
+        with pytest.raises(ValueError):
+            await doc_store.adelete_document(doc_id="non-existent-doc")
 
     async def test_doc_store_ref_doc_not_added(self, async_engine, doc_store):
         # Create a ref_doc & doc.
@@ -367,3 +385,61 @@ class TestAsyncPostgresDocumentStore:
         query = f"""select * from "public"."{default_table_name_async}" where id = '{ref_doc.doc_id}';"""
         result = await afetch(async_engine, query)
         assert len(result) == 0
+
+    async def test_docs(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.docs()
+
+    async def test_add_documents(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.add_documents([])
+
+    async def test_get_document(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.get_document("test_doc_id", raise_error=True)
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.get_document("test_doc_id", raise_error=False)
+
+    async def test_delete_document(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.delete_document("test_doc_id", raise_error=True)
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.delete_document("test_doc_id", raise_error=False)
+
+    async def test_document_exists(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.document_exists("test_doc_id")
+
+    async def test_ref_doc_exists(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.ref_doc_exists(ref_doc_id="test_ref_doc_id")
+
+    async def test_set_document_hash(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.set_document_hash("test_doc_id", "test_doc_hash")
+
+    async def test_set_document_hashes(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.set_document_hashes({"test_doc_id": "test_doc_hash"})
+
+    async def test_get_document_hash(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.get_document_hash(doc_id="test_doc_id")
+
+    async def test_get_all_document_hashes(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.get_all_document_hashes()
+
+    async def test_get_all_ref_doc_info(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.get_all_ref_doc_info()
+
+    async def test_get_ref_doc_info(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.get_ref_doc_info(ref_doc_id="test_doc_id")
+
+    async def test_delete_ref_doc(self, doc_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.delete_ref_doc(ref_doc_id="test_doc_id", raise_error=False)
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            doc_store.delete_ref_doc(ref_doc_id="test_doc_id", raise_error=True)

@@ -117,9 +117,10 @@ class TestPostgresDocumentStoreAsync:
         await aexecute(async_engine, query)
 
     async def test_init_with_constructor(self, async_engine):
+        key = object()
         with pytest.raises(Exception):
             PostgresDocumentStore(
-                engine=async_engine, table_name=default_table_name_async
+                key, engine=async_engine, table_name=default_table_name_async
             )
 
     async def test_async_add_document(self, async_engine, doc_store):

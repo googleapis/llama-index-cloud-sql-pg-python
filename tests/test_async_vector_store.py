@@ -14,6 +14,7 @@
 
 import os
 import uuid
+import warnings
 from typing import Sequence
 
 import pytest
@@ -109,8 +110,8 @@ class TestVectorStore:
         )
 
         yield engine
-        await aexecute(engine, f'DROP TABLE "{DEFAULT_TABLE}"')
-        await aexecute(engine, f'DROP TABLE "{DEFAULT_TABLE_CUSTOM_VS}"')
+        await aexecute(engine, f'DROP TABLE IF EXISTS "{DEFAULT_TABLE}"')
+        await aexecute(engine, f'DROP TABLE IF EXISTS "{DEFAULT_TABLE_CUSTOM_VS}"')
         await engine.close()
 
     @pytest_asyncio.fixture(scope="class")
@@ -153,8 +154,9 @@ class TestVectorStore:
         yield vs
 
     async def test_init_with_constructor(self, engine):
+        key = object()
         with pytest.raises(Exception):
-            AsyncPostgresVectorStore(engine, table_name=DEFAULT_TABLE)
+            AsyncPostgresVectorStore(key, engine, table_name=DEFAULT_TABLE)
 
     async def test_validate_id_column_create(self, engine, vs):
         test_id_column = "test_id_column"
@@ -312,6 +314,70 @@ class TestVectorStore:
         assert results.similarities is not None
         assert len(results.nodes) == 3
         assert results.nodes[0].get_content(metadata_mode=MetadataMode.NONE) == "foo"
+
+    async def test_aquery_filters(self, engine, custom_vs):
+        # Note: To be migrated to a pytest dependency on test_async_add
+        # Blocked due to unexpected fixtures reloads while running integration test suite
+        await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE_CUSTOM_VS}"')
+        # setting extra metadata to be indexed in separate column
+        for node in nodes:
+            node.metadata["len"] = len(node.text)
+
+        await custom_vs.async_add(nodes)
+
+        filters = MetadataFilters(
+            filters=[
+                MetadataFilter(
+                    key="some_test_column",
+                    value=["value_should_be_ignored"],
+                    operator=FilterOperator.CONTAINS,
+                ),
+                MetadataFilter(
+                    key="len",
+                    value=3,
+                    operator=FilterOperator.LTE,
+                ),
+                MetadataFilter(
+                    key="len",
+                    value=3,
+                    operator=FilterOperator.GTE,
+                ),
+                MetadataFilter(
+                    key="len",
+                    value=2,
+                    operator=FilterOperator.GT,
+                ),
+                MetadataFilter(
+                    key="len",
+                    value=4,
+                    operator=FilterOperator.LT,
+                ),
+                MetadataFilters(
+                    filters=[
+                        MetadataFilter(
+                            key="len",
+                            value=6.0,
+                            operator=FilterOperator.NE,
+                        ),
+                    ],
+                    condition=FilterCondition.OR,
+                ),
+            ],
+            condition=FilterCondition.AND,
+        )
+        query = VectorStoreQuery(
+            query_embedding=[1.0] * VECTOR_SIZE, filters=filters, similarity_top_k=-1
+        )
+        with warnings.catch_warnings(record=True) as w:
+            results = await custom_vs.aquery(query)
+
+            assert len(w) == 1
+            assert "Expecting a scalar in the filter value" in str(w[-1].message)
+
+        assert results.nodes is not None
+        assert results.ids is not None
+        assert results.similarities is not None
+        assert len(results.nodes) == 3
 
     async def test_aclear(self, engine, vs):
         # Note: To be migrated to a pytest dependency on test_adelete

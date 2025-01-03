@@ -110,9 +110,9 @@ class TestEngineAsync:
             database=db_name,
         )
         yield engine
-        await aexecute(engine, f'DROP TABLE "{DEFAULT_DS_TABLE}"')
-        await aexecute(engine, f'DROP TABLE "{DEFAULT_VS_TABLE}"')
-        await aexecute(engine, f'DROP TABLE "{DEFAULT_IS_TABLE}"')
+        await aexecute(engine, f'DROP TABLE IF EXISTS "{DEFAULT_DS_TABLE}"')
+        await aexecute(engine, f'DROP TABLE IF EXISTS "{DEFAULT_VS_TABLE}"')
+        await aexecute(engine, f'DROP TABLE IF EXISTS "{DEFAULT_IS_TABLE}"')
         await engine.close()
 
     async def test_password(
@@ -340,10 +340,70 @@ class TestEngineSync:
             database=db_name,
         )
         yield engine
-        await aexecute(engine, f'DROP TABLE "{DEFAULT_DS_TABLE_SYNC}"')
-        await aexecute(engine, f'DROP TABLE "{DEFAULT_IS_TABLE_SYNC}"')
-        await aexecute(engine, f'DROP TABLE "{DEFAULT_VS_TABLE_SYNC}"')
+        await aexecute(engine, f'DROP TABLE IF EXISTS "{DEFAULT_DS_TABLE_SYNC}"')
+        await aexecute(engine, f'DROP TABLE IF EXISTS "{DEFAULT_IS_TABLE_SYNC}"')
+        await aexecute(engine, f'DROP TABLE IF EXISTS "{DEFAULT_VS_TABLE_SYNC}"')
         await engine.close()
+
+    async def test_init_with_constructor(
+        self,
+        db_project,
+        db_region,
+        db_cluster,
+        db_instance,
+        db_name,
+        user,
+        password,
+    ):
+        async def getconn() -> asyncpg.Connection:
+            conn = await connector.connect_async(  # type: ignore
+                f"projects/{db_project}/locations/{db_region}/clusters/{db_cluster}/instances/{db_instance}",
+                "asyncpg",
+                user=user,
+                password=password,
+                db=db_name,
+                enable_iam_auth=False,
+                ip_type=IPTypes.PUBLIC,
+            )
+            return conn
+
+        engine = create_async_engine(
+            "postgresql+asyncpg://",
+            async_creator=getconn,
+        )
+
+        key = object()
+        with pytest.raises(Exception):
+            PostgresEngine(key, engine)
+
+    async def test_missing_user_or_password(
+        self,
+        db_project,
+        db_region,
+        db_cluster,
+        db_instance,
+        db_name,
+        user,
+        password,
+    ):
+        with pytest.raises(ValueError):
+            await PostgresEngine.afrom_instance(
+                project_id=db_project,
+                instance=db_instance,
+                region=db_region,
+                cluster=db_cluster,
+                database=db_name,
+                user=user,
+            )
+        with pytest.raises(ValueError):
+            await PostgresEngine.afrom_instance(
+                project_id=db_project,
+                instance=db_instance,
+                region=db_region,
+                cluster=db_cluster,
+                database=db_name,
+                password=password,
+            )
 
     async def test_password(
         self,

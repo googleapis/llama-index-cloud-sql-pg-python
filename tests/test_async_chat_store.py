@@ -59,10 +59,6 @@ class TestAsyncPostgresChatStores:
         return get_env_var("REGION", "region for Cloud SQL instance")
 
     @pytest.fixture(scope="module")
-    def db_cluster(self) -> str:
-        return get_env_var("CLUSTER_ID", "cluster for Cloud SQL")
-
-    @pytest.fixture(scope="module")
     def db_instance(self) -> str:
         return get_env_var("INSTANCE_ID", "instance for Cloud SQL")
 
@@ -83,14 +79,12 @@ class TestAsyncPostgresChatStores:
         self,
         db_project,
         db_region,
-        db_cluster,
         db_instance,
         db_name,
     ):
         async_engine = await PostgresEngine.afrom_instance(
             project_id=db_project,
             instance=db_instance,
-            cluster=db_cluster,
             region=db_region,
             database=db_name,
         )

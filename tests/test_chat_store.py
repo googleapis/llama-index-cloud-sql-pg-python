@@ -1,4 +1,3 @@
-
 # Copyright 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,9 +85,7 @@ class TestPostgresChatStoreAsync:
         return get_env_var("DB_PASSWORD", "database password for Cloud SQL")
 
     @pytest_asyncio.fixture(scope="class")
-    async def async_engine(
-        self, db_project, db_region, db_instance, db_name
-    ):
+    async def async_engine(self, db_project, db_region, db_instance, db_name):
         async_engine = await PostgresEngine.afrom_instance(
             project_id=db_project,
             instance=db_instance,
@@ -250,9 +247,7 @@ class TestPostgresChatStoreSync:
         return get_env_var("DB_PASSWORD", "database password for Cloud SQL")
 
     @pytest_asyncio.fixture(scope="class")
-    async def sync_engine(
-        self, db_project, db_region, db_instance, db_name
-    ):
+    async def sync_engine(self, db_project, db_region, db_instance, db_name):
         sync_engine = PostgresEngine.from_instance(
             project_id=db_project,
             instance=db_instance,

@@ -756,6 +756,91 @@ class PostgresEngine:
             )
         )
 
+    async def _ainit_chat_store_table(
+        self,
+        table_name: str,
+        schema_name: str = "public",
+        overwrite_existing: bool = False,
+    ) -> None:
+        """
+        Create an table to save chat store.
+        Args:
+            table_name (str): The table name to store chat history.
+            schema_name (str): The schema name to store the chat store table.
+                Default: "public".
+            overwrite_existing (bool): Whether to drop existing table.
+                Default: False.
+        Returns:
+            None
+        """
+        if overwrite_existing:
+            async with self._pool.connect() as conn:
+                await conn.execute(
+                    text(f'DROP TABLE IF EXISTS "{schema_name}"."{table_name}"')
+                )
+                await conn.commit()
+
+        create_table_query = f"""CREATE TABLE "{schema_name}"."{table_name}"(
+            id SERIAL PRIMARY KEY,
+            key VARCHAR NOT NULL,
+            message JSON NOT NULL
+        );"""
+        create_index_query = f"""CREATE INDEX "{table_name}_idx_key" ON "{schema_name}"."{table_name}" (key);"""
+        async with self._pool.connect() as conn:
+            await conn.execute(text(create_table_query))
+            await conn.execute(text(create_index_query))
+            await conn.commit()
+
+    async def ainit_chat_store_table(
+        self,
+        table_name: str,
+        schema_name: str = "public",
+        overwrite_existing: bool = False,
+    ) -> None:
+        """
+        Create an table to save chat store.
+        Args:
+            table_name (str): The table name to store chat store.
+            schema_name (str): The schema name to store the chat store table.
+                Default: "public".
+            overwrite_existing (bool): Whether to drop existing table.
+                Default: False.
+        Returns:
+            None
+        """
+        await self._run_as_async(
+            self._ainit_chat_store_table(
+                table_name,
+                schema_name,
+                overwrite_existing,
+            )
+        )
+
+    def init_chat_store_table(
+        self,
+        table_name: str,
+        schema_name: str = "public",
+        overwrite_existing: bool = False,
+    ) -> None:
+        """
+        Create an table to save chat store.
+        Args:
+            table_name (str): The table name to store chat store.
+            schema_name (str): The schema name to store the chat store table.
+                Default: "public".
+            overwrite_existing (bool): Whether to drop existing table.
+                Default: False.
+        Returns:
+            None
+        """
+        self._run_as_sync(
+            self._ainit_chat_store_table(
+                table_name,
+                schema_name,
+                overwrite_existing,
+            )
+        )
+
     async def _aload_table_schema(
         self, table_name: str, schema_name: str = "public"
     ) -> Table:

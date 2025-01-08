@@ -1,0 +1,4 @@
+assign_issues:
+  - googleapis/llama-index-cloud-sql
+assign_prs:
+  - googleapis/llama-index-cloud-sql

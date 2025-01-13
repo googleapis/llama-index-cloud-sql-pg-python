@@ -96,6 +96,7 @@ class TestPostgresIndexStoreAsync:
         yield async_engine
 
         await async_engine.close()
+        await async_engine._connector.close_async()
 
     @pytest_asyncio.fixture(scope="class")
     async def index_store(self, async_engine):
@@ -111,8 +112,11 @@ class TestPostgresIndexStoreAsync:
         await aexecute(async_engine, query)
 
     async def test_init_with_constructor(self, async_engine):
+        key = object()
         with pytest.raises(Exception):
-            PostgresIndexStore(engine=async_engine, table_name=default_table_name_async)
+            PostgresIndexStore(
+                key, engine=async_engine, table_name=default_table_name_async
+            )
 
     async def test_add_and_delete_index(self, index_store, async_engine):
         index_struct = IndexGraph()
@@ -209,6 +213,7 @@ class TestPostgresIndexStoreSync:
         yield async_engine
 
         await async_engine.close()
+        await async_engine._connector.close_async()
 
     @pytest_asyncio.fixture(scope="class")
     async def index_store(self, async_engine):
@@ -224,8 +229,11 @@ class TestPostgresIndexStoreSync:
         await aexecute(async_engine, query)
 
     async def test_init_with_constructor(self, async_engine):
+        key = object()
         with pytest.raises(Exception):
-            PostgresIndexStore(engine=async_engine, table_name=default_table_name_sync)
+            PostgresIndexStore(
+                key, engine=async_engine, table_name=default_table_name_sync
+            )
 
     async def test_add_and_delete_index(self, index_store, async_engine):
         index_struct = IndexGraph()

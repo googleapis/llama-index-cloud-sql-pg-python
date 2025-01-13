@@ -102,6 +102,7 @@ class TestPostgresDocumentStoreAsync:
         yield async_engine
 
         await async_engine.close()
+        await async_engine._connector.close_async()
 
     @pytest_asyncio.fixture(scope="class")
     async def doc_store(self, async_engine):
@@ -117,9 +118,10 @@ class TestPostgresDocumentStoreAsync:
         await aexecute(async_engine, query)
 
     async def test_init_with_constructor(self, async_engine):
+        key = object()
         with pytest.raises(Exception):
             PostgresDocumentStore(
-                engine=async_engine, table_name=default_table_name_async
+                key, engine=async_engine, table_name=default_table_name_async
             )
 
     async def test_async_add_document(self, async_engine, doc_store):
@@ -387,6 +389,7 @@ class TestPostgresDocumentStoreSync:
         yield sync_engine
 
         await sync_engine.close()
+        await sync_engine._connector.close_async()
 
     @pytest_asyncio.fixture(scope="class")
     async def sync_doc_store(self, sync_engine):

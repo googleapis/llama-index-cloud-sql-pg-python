@@ -117,6 +117,7 @@ class TestEngineAsync:
         await aexecute(engine, f'DROP TABLE "{DEFAULT_IS_TABLE}"')
         await aexecute(engine, f'DROP TABLE "{DEFAULT_CS_TABLE}"')
         await engine.close()
+        await engine._connector.close_async()
 
     async def test_password(
         self,
@@ -171,6 +172,7 @@ class TestEngineAsync:
             engine = PostgresEngine.from_engine(engine)
             await aexecute(engine, "SELECT 1")
             await engine.close()
+            await engine._connector.close_async()
 
     async def test_from_connection_string(self, db_name, user, password, host):
         port = "5432"
@@ -182,12 +184,14 @@ class TestEngineAsync:
         )
         await aexecute(engine, "SELECT 1")
         await engine.close()
+        await engine._connector.close_async()
 
         engine = PostgresEngine.from_engine_args(
             URL.create("postgresql+asyncpg", user, password, host, port, db_name)
         )
         await aexecute(engine, "SELECT 1")
         await engine.close()
+        await engine._connector.close_async()
 
     async def test_from_connection_string_url_error(
         self,
@@ -233,6 +237,7 @@ class TestEngineAsync:
         assert engine
         await aexecute(engine, "SELECT 1")
         await engine.close()
+        await engine._connector.close_async()
 
     async def test_init_document_store(self, engine):
         await engine.ainit_doc_store_table(
@@ -351,12 +356,14 @@ class TestEngineSync:
         return get_env_var("IP_ADDRESS", "IP Address for the connection string")
 
     @pytest_asyncio.fixture(scope="class")
-    async def engine(self, db_project, db_region, db_instance, db_name):
+    async def engine(self, db_project, db_region, db_instance, db_name, user, password):
         engine = PostgresEngine.from_instance(
             project_id=db_project,
             instance=db_instance,
             region=db_region,
             database=db_name,
+            user=user,
+            password=password,
         )
         yield engine
         await aexecute(engine, f'DROP TABLE "{DEFAULT_DS_TABLE_SYNC}"')
@@ -364,6 +371,7 @@ class TestEngineSync:
         await aexecute(engine, f'DROP TABLE "{DEFAULT_VS_TABLE_SYNC}"')
         await aexecute(engine, f'DROP TABLE "{DEFAULT_CS_TABLE_SYNC}"')
         await engine.close()
+        await engine._connector.close_async()
 
     async def test_password(
         self,
@@ -414,6 +422,7 @@ class TestEngineSync:
         assert engine
         await aexecute(engine, "SELECT 1")
         await engine.close()
+        await engine._connector.close_async()
 
     async def test_init_document_store(self, engine):
         engine.init_doc_store_table(

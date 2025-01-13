@@ -92,6 +92,7 @@ class TestAsyncPostgresChatStores:
         yield async_engine
 
         await async_engine.close()
+        await async_engine._connector.close_async()
 
     @pytest_asyncio.fixture(scope="class")
     async def chat_store(self, async_engine):

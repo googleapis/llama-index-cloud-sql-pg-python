@@ -183,14 +183,12 @@ class TestEngineAsync:
         )
         await aexecute(engine, "SELECT 1")
         await engine.close()
-        await engine._connector.close_async()
 
         engine = PostgresEngine.from_engine_args(
             URL.create("postgresql+asyncpg", user, password, host, port, db_name)
         )
         await aexecute(engine, "SELECT 1")
         await engine.close()
-        await engine._connector.close_async()
 
     async def test_from_connection_string_url_error(
         self,

@@ -117,8 +117,9 @@ class TestVectorStoreAsync:
         )
         yield sync_engine
 
-        await aexecute(sync_engine, f'DROP TABLE "{DEFAULT_TABLE}"')
+        await aexecute(sync_engine, f'DROP TABLE IF EXISTS "{DEFAULT_TABLE}"')
         await sync_engine.close()
+        await sync_engine._connector.close_async()
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):
@@ -129,8 +130,9 @@ class TestVectorStoreAsync:
         yield vs
 
     async def test_init_with_constructor(self, engine):
+        key = object()
         with pytest.raises(Exception):
-            PostgresVectorStore(engine, table_name=DEFAULT_TABLE)
+            PostgresVectorStore(key, engine, table_name=DEFAULT_TABLE)
 
     async def test_validate_id_column_create(self, engine, vs):
         test_id_column = "test_id_column"
@@ -491,8 +493,9 @@ class TestVectorStoreSync:
         )
         yield sync_engine
 
-        await aexecute(sync_engine, f'DROP TABLE "{DEFAULT_TABLE}"')
+        await aexecute(sync_engine, f'DROP TABLE IF EXISTS "{DEFAULT_TABLE}"')
         await sync_engine.close()
+        await sync_engine._connector.close_async()
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):
@@ -503,8 +506,9 @@ class TestVectorStoreSync:
         yield vs
 
     async def test_init_with_constructor(self, engine):
+        key = object()
         with pytest.raises(Exception):
-            PostgresVectorStore(engine, table_name=DEFAULT_TABLE)
+            PostgresVectorStore(key, engine, table_name=DEFAULT_TABLE)
 
     async def test_validate_id_column_create(self, engine, vs):
         test_id_column = "test_id_column"

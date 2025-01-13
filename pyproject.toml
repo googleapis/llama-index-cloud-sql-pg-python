@@ -50,6 +50,9 @@ test = [
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "class"
+
 [tool.black]
 target-version = ['py39']
 

@@ -536,7 +536,7 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
             self._text_column,
             self._embedding_column,
             self._ref_doc_id_column,
-            self._node_column
+            self._node_column,
         ]
         if self._metadata_json_column:
             columns.append(self._metadata_json_column)

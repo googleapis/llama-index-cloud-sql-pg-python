@@ -531,7 +531,19 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
             f" LIMIT {query.similarity_top_k} " if query.similarity_top_k >= 1 else ""
         )
 
-        query_stmt = f'SELECT * {scoring_stmt} FROM "{self._schema_name}"."{self._table_name}" {filters_stmt} {order_stmt} {limit_stmt}'
+        columns = self._metadata_columns + [
+            self._id_column,
+            self._text_column,
+            self._embedding_column,
+            self._ref_doc_id_column,
+            self._node_column,
+        ]
+        if self._metadata_json_column:
+            columns.append(self._metadata_json_column)
+
+        column_names = ", ".join(f'"{col}"' for col in columns)
+
+        query_stmt = f'SELECT {column_names} {scoring_stmt} FROM "{self._schema_name}"."{self._table_name}" {filters_stmt} {order_stmt} {limit_stmt}'
         async with self._engine.connect() as conn:
             if self._index_query_options:
                 query_options_stmt = (

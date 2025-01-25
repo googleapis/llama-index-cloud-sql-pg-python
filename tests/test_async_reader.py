@@ -93,7 +93,6 @@ class TestAsyncPostgresReader:
         )
 
         await async_engine.close()
-        await async_engine._connector.close()
 
     async def _cleanup_table(self, engine):
         await aexecute(engine, f'DROP TABLE IF EXISTS "{default_table_name_async}"')

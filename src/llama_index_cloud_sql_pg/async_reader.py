@@ -259,7 +259,7 @@ class AsyncPostgresReader(BasePydanticReader):
                     self._metadata_json_column,
                 )
 
-    def lazy_load_data(self) -> Iterator[Document]:
+    def lazy_load_data(self) -> Iterable[Document]:
         raise NotImplementedError(
             "Sync methods are not implemented for AsyncPostgresReader. Use PostgresReader interface instead."
         )

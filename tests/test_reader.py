@@ -329,7 +329,7 @@ class TestPostgresReaderAsync:
                 variety JSON NOT NULL,
                 quantity_in_stock INT NOT NULL,
                 price_per_unit INT NOT NULL,
-                llamaindex_metadata JSON NOT NULL
+                li_metadata JSON NOT NULL
             )
             """
         await aexecute(async_engine, query)
@@ -338,7 +338,7 @@ class TestPostgresReaderAsync:
         variety = json.dumps({"type": "Granny Smith"})
         insert_query = f"""
             INSERT INTO "{table_name}"
-            (fruit_name, variety, quantity_in_stock, price_per_unit, llamaindex_metadata)
+            (fruit_name, variety, quantity_in_stock, price_per_unit, li_metadata)
             VALUES ('Apple', '{variety}', 150, 1, '{metadata}');"""
         await aexecute(async_engine, insert_query)
 
@@ -750,7 +750,7 @@ class TestPostgresReaderSync:
                 variety JSON NOT NULL,
                 quantity_in_stock INT NOT NULL,
                 price_per_unit INT NOT NULL,
-                llamaindex_metadata JSON NOT NULL
+                li_metadata JSON NOT NULL
             )
             """
         await aexecute(sync_engine, query)
@@ -759,7 +759,7 @@ class TestPostgresReaderSync:
         variety = json.dumps({"type": "Granny Smith"})
         insert_query = f"""
             INSERT INTO "{table_name}"
-            (fruit_name, variety, quantity_in_stock, price_per_unit, llamaindex_metadata)
+            (fruit_name, variety, quantity_in_stock, price_per_unit, li_metadata)
             VALUES ('Apple', '{variety}', 150, 1, '{metadata}');"""
         await aexecute(sync_engine, insert_query)
 

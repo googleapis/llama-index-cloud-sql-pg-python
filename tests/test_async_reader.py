@@ -314,7 +314,7 @@ class TestAsyncPostgresReader:
                 variety JSON NOT NULL,
                 quantity_in_stock INT NOT NULL,
                 price_per_unit INT NOT NULL,
-                llamaindex_metadata JSON NOT NULL
+                li_metadata JSON NOT NULL
             )
             """
         await aexecute(async_engine, query)
@@ -323,7 +323,7 @@ class TestAsyncPostgresReader:
         variety = json.dumps({"type": "Granny Smith"})
         insert_query = f"""
             INSERT INTO "{table_name}"
-            (fruit_name, variety, quantity_in_stock, price_per_unit, llamaindex_metadata)
+            (fruit_name, variety, quantity_in_stock, price_per_unit, li_metadata)
             VALUES ('Apple', '{variety}', 150, 1, '{metadata}');"""
         await aexecute(async_engine, insert_query)
 

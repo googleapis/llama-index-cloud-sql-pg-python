@@ -25,7 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from .engine import PostgresEngine
 
-DEFAULT_METADATA_COL = "llamaindex_metadata"
+DEFAULT_METADATA_COL = "li_metadata"
 
 
 def text_formatter(row: dict, content_columns: list[str]) -> str:
@@ -64,7 +64,7 @@ def _parse_doc_from_row(
     """Parse row into document."""
     text = formatter(row, content_columns)
     metadata: dict[str, Any] = {}
-    # unnest metadata from llamaindex_metadata column
+    # unnest metadata from li_metadata column
     if metadata_json_column and row.get(metadata_json_column):
         for k, v in row[metadata_json_column].items():
             metadata[k] = v
@@ -108,7 +108,7 @@ class AsyncPostgresReader(BasePydanticReader):
             content_columns (Optional[list[str]], optional): Column that represent a Document's page_content. Defaults to the first column.
             metadata_columns (Optional[list[str]], optional): Column(s) that represent a Document's metadata. Defaults to None.
             formatter (Optional[Callable], optional): A function to format page content (OneOf: format, formatter). Defaults to None.
-            metadata_json_column (Optional[str], optional): Column to store metadata as JSON. Defaults to "llamaindex_metadata".
+            metadata_json_column (Optional[str], optional): Column to store metadata as JSON. Defaults to "li_metadata".
             is_remote (bool): Whether the data is loaded from a remote API or a local file.
 
         Raises:
@@ -149,7 +149,7 @@ class AsyncPostgresReader(BasePydanticReader):
             schema_name (str, optional): Name of the schema where table is located. Defaults to "public".
             content_columns (Optional[list[str]], optional): Column that represent a Document's page_content. Defaults to the first column.
             metadata_columns (Optional[list[str]], optional): Column(s) that represent a Document's metadata. Defaults to None.
-            metadata_json_column (Optional[str], optional): Column to store metadata as JSON. Defaults to "llamaindex_metadata".
+            metadata_json_column (Optional[str], optional): Column to store metadata as JSON. Defaults to "li_metadata".
             format (Optional[str], optional): Format of page content (OneOf: text, csv, YAML, JSON). Defaults to 'text'.
             formatter (Optional[Callable], optional): A function to format page content (OneOf: format, formatter). Defaults to None.
             is_remote (bool): Whether the data is loaded from a remote API or a local file.

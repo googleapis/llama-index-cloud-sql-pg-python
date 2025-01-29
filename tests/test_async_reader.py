@@ -26,6 +26,7 @@ from llama_index_cloud_sql_pg import PostgresEngine
 from llama_index_cloud_sql_pg.async_reader import AsyncPostgresReader
 
 default_table_name_async = "reader_test_" + str(uuid.uuid4())
+sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresReader. Use PostgresReader interface instead."
 
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:
@@ -83,17 +84,28 @@ class TestAsyncPostgresReader:
             region=db_region,
             database=db_name,
         )
+        await self._create_default_table(async_engine)
 
         yield async_engine
 
-        await aexecute(
-            async_engine, f'DROP TABLE IF EXISTS "{default_table_name_async}"'
-        )
-
+        await self._cleanup_table(async_engine)
         await async_engine.close()
 
     async def _cleanup_table(self, engine):
         await aexecute(engine, f'DROP TABLE IF EXISTS "{default_table_name_async}"')
+
+    async def _create_default_table(self, engine):
+        create_query = f"""
+                CREATE TABLE IF NOT EXISTS "{default_table_name_async}" (
+                    fruit_id SERIAL PRIMARY KEY,
+                    fruit_name VARCHAR(100) NOT NULL,
+                    variety VARCHAR(50),
+                    quantity_in_stock INT NOT NULL,
+                    price_per_unit INT NOT NULL,
+                    organic INT NOT NULL
+                )
+            """
+        await aexecute(engine, create_query)
 
     async def _collect_async_items(self, docs_generator):
         """Collects items from an async generator."""
@@ -124,6 +136,24 @@ class TestAsyncPostgresReader:
                 table_name=default_table_name_async,
                 format="fake_format",
             )
+
+    async def test_lazy_load_data(self, async_engine):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            reader = await AsyncPostgresReader.create(
+                engine=async_engine,
+                table_name=default_table_name_async,
+            )
+
+            reader.lazy_load_data()
+
+    async def test_load_data(self, async_engine):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            reader = await AsyncPostgresReader.create(
+                engine=async_engine,
+                table_name=default_table_name_async,
+            )
+
+            reader.load_data()
 
     async def test_load_from_query_default(self, async_engine):
         table_name = "test-table" + str(uuid.uuid4())

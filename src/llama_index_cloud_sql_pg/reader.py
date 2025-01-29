@@ -167,6 +167,7 @@ class PostgresReader(BasePydanticReader):
 
     async def alazy_load_data(self) -> AsyncIterable[Document]:  # type: ignore
         """Asynchronously load Cloud SQL postgres data into Document objects lazily."""
+        # The return type in the underlying base class is an Iterable which we are overriding to an AsyncIterable in this implementation.
         iterator = self.__reader.alazy_load_data().__aiter__()
         while True:
             try:
@@ -176,7 +177,7 @@ class PostgresReader(BasePydanticReader):
                 break
 
     def lazy_load_data(self) -> Iterable[Document]:  # type: ignore
-        """Synchronously aoad Cloud SQL postgres data into Document objects lazily."""
+        """Synchronously load Cloud SQL postgres data into Document objects lazily."""
         iterator = self.__reader.alazy_load_data().__aiter__()
         while True:
             try:

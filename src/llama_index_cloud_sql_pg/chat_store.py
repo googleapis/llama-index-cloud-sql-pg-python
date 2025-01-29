@@ -36,7 +36,7 @@ class PostgresChatStore(BaseChatStore):
         Args:
             key (object): Key to prevent direct constructor usage.
             engine (PostgresEngine): Database connection pool.
-            chat_store (AsyncPostgresChatStore): The async only IndexStore implementation
+            chat_store (AsyncPostgresChatStore): The async only ChatStore implementation
 
         Raises:
             Exception: If constructor is directly called by the user.

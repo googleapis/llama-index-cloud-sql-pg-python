@@ -16,6 +16,7 @@ from .chat_store import PostgresChatStore
 from .document_store import PostgresDocumentStore
 from .engine import Column, PostgresEngine
 from .index_store import PostgresIndexStore
+from .reader import PostgresReader
 from .vector_store import PostgresVectorStore
 from .version import __version__
 
@@ -25,6 +26,7 @@ _all = [
     "PostgresEngine",
     "PostgresDocumentStore",
     "PostgresIndexStore",
+    "PostgresReader",
     "PostgresVectorStore",
     "__version__",
 ]

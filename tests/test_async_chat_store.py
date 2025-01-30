@@ -25,7 +25,7 @@ from llama_index_cloud_sql_pg import PostgresEngine
 from llama_index_cloud_sql_pg.async_chat_store import AsyncPostgresChatStore
 
 default_table_name_async = "chat_store_" + str(uuid.uuid4())
-sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore interface instead."
+sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
 
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:

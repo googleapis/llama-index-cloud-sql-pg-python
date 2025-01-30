@@ -261,35 +261,35 @@ class AsyncPostgresChatStore(BaseChatStore):
 
     def set_messages(self, key: str, messages: List[ChatMessage]) -> None:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
         )
 
     def get_messages(self, key: str) -> List[ChatMessage]:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
         )
 
     def add_message(self, key: str, message: ChatMessage) -> None:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
         )
 
     def delete_messages(self, key: str) -> Optional[List[ChatMessage]]:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
         )
 
     def delete_message(self, key: str, idx: int) -> Optional[ChatMessage]:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
         )
 
     def delete_last_message(self, key: str) -> Optional[ChatMessage]:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
         )
 
     def get_keys(self) -> List[str]:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
         )

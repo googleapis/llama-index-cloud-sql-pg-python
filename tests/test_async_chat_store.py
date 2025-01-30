@@ -25,6 +25,7 @@ from llama_index_cloud_sql_pg import PostgresEngine
 from llama_index_cloud_sql_pg.async_chat_store import AsyncPostgresChatStore
 
 default_table_name_async = "chat_store_" + str(uuid.uuid4())
+sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresChatStore . Use PostgresChatStore interface instead."
 
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:
@@ -217,3 +218,31 @@ class TestAsyncPostgresChatStores:
 
         assert results[0]["message"] == message_2.dict()
         assert results[1]["message"] == message_3.dict()
+
+    async def test_set_messages(self, chat_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            chat_store.set_messages("test_key", [])
+
+    async def test_get_messages(self, chat_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            chat_store.get_messages("test_key")
+
+    async def test_add_message(self, chat_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            chat_store.add_message("test_key", ChatMessage(content="test", role="user"))
+
+    async def test_delete_messages(self, chat_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            chat_store.delete_messages("test_key")
+
+    async def test_delete_message(self, chat_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            chat_store.delete_message("test_key", 0)
+
+    async def test_delete_last_message(self, chat_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            chat_store.delete_last_message("test_key")
+
+    async def test_get_keys(self, chat_store):
+        with pytest.raises(Exception, match=sync_method_exception_str):
+            chat_store.get_keys()

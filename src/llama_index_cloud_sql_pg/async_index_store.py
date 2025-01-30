@@ -191,22 +191,22 @@ class AsyncPostgresIndexStore(BaseIndexStore):
 
     def index_structs(self) -> list[IndexStruct]:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresIndexStore . Use PostgresIndexStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresIndexStore. Use PostgresIndexStore interface instead."
         )
 
     def add_index_struct(self, index_struct: IndexStruct) -> None:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresIndexStore . Use PostgresIndexStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresIndexStore. Use PostgresIndexStore interface instead."
         )
 
     def delete_index_struct(self, key: str) -> None:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresIndexStore . Use PostgresIndexStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresIndexStore. Use PostgresIndexStore interface instead."
         )
 
     def get_index_struct(
         self, struct_id: Optional[str] = None
     ) -> Optional[IndexStruct]:
         raise NotImplementedError(
-            "Sync methods are not implemented for AsyncPostgresIndexStore . Use PostgresIndexStore  interface instead."
+            "Sync methods are not implemented for AsyncPostgresIndexStore. Use PostgresIndexStore interface instead."
         )

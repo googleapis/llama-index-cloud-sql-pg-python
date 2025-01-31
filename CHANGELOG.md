@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.0](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.1.0...v0.2.0) (2025-01-30)
+
+
+### Features
+
+* Add Async Chat Store ([#38](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/38)) ([2b14f5a](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/2b14f5a946e595bce145bf1b526138cf393250ed))
+* Add Async Postgres Reader ([#52](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/52)) ([591600f](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/591600f13acac0ec7bf97ee3bc83041a99b3edec))
+* Add chat store init methods ([#39](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/39)) ([0ef1fa5](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/0ef1fa5c945c9012354fc6cacb4fc50dd12c0c19))
+* Add Postgres Chat Store ([#40](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/40)) ([7787d7d](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/7787d7d1161dd994c11ac8a75eb5890cf9309cee))
+* Add Postgres Reader ([#53](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/53)) ([4ceade4](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/4ceade46a00980d2e75d03fde11b8a1f888dfc25))
+
+
+### Bug Fixes
+
+* Query and return only selected metadata columns ([#48](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/48)) ([5173e11](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/5173e11831387909a12841bb232f8e39c113bd60))
+
 ## 0.1.0 (2024-12-03)
 
 

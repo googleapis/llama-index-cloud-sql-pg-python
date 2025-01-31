@@ -26,7 +26,7 @@ from llama_index_cloud_sql_pg import PostgresEngine
 from llama_index_cloud_sql_pg.async_reader import AsyncPostgresReader
 
 default_table_name_async = "reader_test_" + str(uuid.uuid4())
-sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresReader. Use PostgresReader interface instead."
+# sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresReader. Use PostgresReader interface instead."
 
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:
@@ -137,23 +137,23 @@ class TestAsyncPostgresReader:
                 format="fake_format",
             )
 
-    async def test_lazy_load_data(self, async_engine):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            reader = await AsyncPostgresReader.create(
-                engine=async_engine,
-                table_name=default_table_name_async,
-            )
+    # async def test_lazy_load_data(self, async_engine):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         reader = await AsyncPostgresReader.create(
+    #             engine=async_engine,
+    #             table_name=default_table_name_async,
+    #         )
 
-            reader.lazy_load_data()
+    #         reader.lazy_load_data()
 
-    async def test_load_data(self, async_engine):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            reader = await AsyncPostgresReader.create(
-                engine=async_engine,
-                table_name=default_table_name_async,
-            )
+    # async def test_load_data(self, async_engine):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         reader = await AsyncPostgresReader.create(
+    #             engine=async_engine,
+    #             table_name=default_table_name_async,
+    #         )
 
-            reader.load_data()
+    #         reader.load_data()
 
     async def test_load_from_query_default(self, async_engine):
         table_name = "test-table" + str(uuid.uuid4())

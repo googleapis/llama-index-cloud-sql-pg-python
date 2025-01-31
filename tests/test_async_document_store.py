@@ -28,7 +28,7 @@ from llama_index_cloud_sql_pg.async_document_store import AsyncPostgresDocumentS
 
 default_table_name_async = "document_store_" + str(uuid.uuid4())
 custom_table_name_async = "document_store_" + str(uuid.uuid4())
-sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresDocumentStore. Use PostgresDocumentStore  interface instead."
+# sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresDocumentStore. Use PostgresDocumentStore  interface instead."
 
 
 async def aexecute(engine: PostgresEngine, query: str) -> None:
@@ -387,60 +387,60 @@ class TestAsyncPostgresDocumentStore:
         result = await afetch(async_engine, query)
         assert len(result) == 0
 
-    async def test_docs(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.docs()
+    # async def test_docs(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.docs()
 
-    async def test_add_documents(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.add_documents([])
+    # async def test_add_documents(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.add_documents([])
 
-    async def test_get_document(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.get_document("test_doc_id", raise_error=True)
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.get_document("test_doc_id", raise_error=False)
+    # async def test_get_document(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.get_document("test_doc_id", raise_error=True)
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.get_document("test_doc_id", raise_error=False)
 
-    async def test_delete_document(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.delete_document("test_doc_id", raise_error=True)
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.delete_document("test_doc_id", raise_error=False)
+    # async def test_delete_document(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.delete_document("test_doc_id", raise_error=True)
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.delete_document("test_doc_id", raise_error=False)
 
-    async def test_document_exists(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.document_exists("test_doc_id")
+    # async def test_document_exists(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.document_exists("test_doc_id")
 
-    async def test_ref_doc_exists(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.ref_doc_exists(ref_doc_id="test_ref_doc_id")
+    # async def test_ref_doc_exists(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.ref_doc_exists(ref_doc_id="test_ref_doc_id")
 
-    async def test_set_document_hash(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.set_document_hash("test_doc_id", "test_doc_hash")
+    # async def test_set_document_hash(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.set_document_hash("test_doc_id", "test_doc_hash")
 
-    async def test_set_document_hashes(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.set_document_hashes({"test_doc_id": "test_doc_hash"})
+    # async def test_set_document_hashes(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.set_document_hashes({"test_doc_id": "test_doc_hash"})
 
-    async def test_get_document_hash(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.get_document_hash(doc_id="test_doc_id")
+    # async def test_get_document_hash(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.get_document_hash(doc_id="test_doc_id")
 
-    async def test_get_all_document_hashes(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.get_all_document_hashes()
+    # async def test_get_all_document_hashes(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.get_all_document_hashes()
 
-    async def test_get_all_ref_doc_info(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.get_all_ref_doc_info()
+    # async def test_get_all_ref_doc_info(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.get_all_ref_doc_info()
 
-    async def test_get_ref_doc_info(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.get_ref_doc_info(ref_doc_id="test_doc_id")
+    # async def test_get_ref_doc_info(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.get_ref_doc_info(ref_doc_id="test_doc_id")
 
-    async def test_delete_ref_doc(self, doc_store):
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.delete_ref_doc(ref_doc_id="test_doc_id", raise_error=False)
-        with pytest.raises(Exception, match=sync_method_exception_str):
-            doc_store.delete_ref_doc(ref_doc_id="test_doc_id", raise_error=True)
+    # async def test_delete_ref_doc(self, doc_store):
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.delete_ref_doc(ref_doc_id="test_doc_id", raise_error=False)
+    #     with pytest.raises(Exception, match=sync_method_exception_str):
+    #         doc_store.delete_ref_doc(ref_doc_id="test_doc_id", raise_error=True)

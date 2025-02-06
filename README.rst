@@ -96,7 +96,7 @@ Use a vector store to store embedded data and perform vector search.
 
    credentials, project_id = google.auth.default()
    engine = await PostgresEngine.afrom_instance(
-      "project-id", "region", "my-cluster", "my-instance", "my-database"
+      "project-id", "region", "my-instance", "my-database"
    )
    Settings.embed_model = VertexTextEmbedding(
       model_name="textembedding-gecko@003",
@@ -120,7 +120,7 @@ Use a document store to make storage and maintenance of data easier.
 
 
    engine = await PostgresEngine.afrom_instance(
-      "project-id", "region", "my-cluster", "my-instance", "my-database"
+      "project-id", "region", "my-instance", "my-database"
    )
    doc_store = await PostgresDocumentStore.create(
       engine=engine, table_name="doc_store"
@@ -138,7 +138,7 @@ Use an index store to keep track of indexes built on documents.
 
 
    engine = await PostgresEngine.from_instance(
-      "project-id", "region", "my-cluster", "my-instance", "my-database"
+      "project-id", "region", "my-instance", "my-database"
    )
    index_store = await PostgresIndexStore.create(
       engine=engine, table_name="index_store"

@@ -57,7 +57,7 @@ def docs(session):
         "recommonmark",
     )
 
-    shutil.rmtree(os.path.join("docs", "_build"), ignore_errors=True)
+    shutil.rmtree(os.path.join("samples", "_build"), ignore_errors=True)
     session.run(
         "sphinx-build",
         "-W",  # warnings as errors
@@ -66,9 +66,9 @@ def docs(session):
         "-b",
         "html",
         "-d",
-        os.path.join("docs", "_build", "doctrees", ""),
-        os.path.join("docs", ""),
-        os.path.join("docs", "_build", "html", ""),
+        os.path.join("samples", "_build", "doctrees", ""),
+        os.path.join("samples", ""),
+        os.path.join("samples", "_build", "html", ""),
     )
 
 
@@ -92,7 +92,7 @@ def docfx(session):
         "recommonmark",
     )
 
-    shutil.rmtree(os.path.join("docs", "_build"), ignore_errors=True)
+    shutil.rmtree(os.path.join("samples", "_build"), ignore_errors=True)
     session.run(
         "sphinx-build",
         "-T",  # show full traceback on exception
@@ -112,7 +112,7 @@ def docfx(session):
         "-b",
         "html",
         "-d",
-        os.path.join("docs", "_build", "doctrees", ""),
-        os.path.join("docs", ""),
-        os.path.join("docs", "_build", "html", ""),
+        os.path.join("samples", "_build", "doctrees", ""),
+        os.path.join("samples", ""),
+        os.path.join("samples", "_build", "html", ""),
     )

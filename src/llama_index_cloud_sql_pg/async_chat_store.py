@@ -137,7 +137,7 @@ class AsyncPostgresChatStore(BaseChatStore):
         params = [
             {
                 "key": key,
-                "message": json.dumps(message.dict()),
+                "message": json.dumps(message.model_dump()),
             }
             for message in messages
         ]
@@ -175,7 +175,7 @@ class AsyncPostgresChatStore(BaseChatStore):
         insert_query = f"""
                 INSERT INTO "{self._schema_name}"."{self._table_name}" (key, message)
                 VALUES (:key, :message);"""
-        params = {"key": key, "message": json.dumps(message.dict())}
+        params = {"key": key, "message": json.dumps(message.model_dump())}
 
         await self.__aexecute_query(insert_query, params)
 

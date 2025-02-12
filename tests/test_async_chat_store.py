@@ -123,7 +123,7 @@ class TestAsyncPostgresChatStores:
         query = f"""select * from "public"."{default_table_name_async}" where key = '{key}';"""
         results = await afetch(async_engine, query)
         result = results[0]
-        assert result["message"] == message.dict()
+        assert result["message"] == message.model_dump()
 
     async def test_aset_and_aget_messages(self, chat_store):
         message_1 = ChatMessage(content="First message", role="user")
@@ -161,7 +161,7 @@ class TestAsyncPostgresChatStores:
         results = await afetch(async_engine, query)
 
         assert len(results) == 1
-        assert results[0]["message"] == message_1.dict()
+        assert results[0]["message"] == message_1.model_dump()
 
     async def test_adelete_last_message(self, async_engine, chat_store):
         message_1 = ChatMessage(content="Message 1", role="user")
@@ -176,8 +176,8 @@ class TestAsyncPostgresChatStores:
         results = await afetch(async_engine, query)
 
         assert len(results) == 2
-        assert results[0]["message"] == message_1.dict()
-        assert results[1]["message"] == message_2.dict()
+        assert results[0]["message"] == message_1.model_dump()
+        assert results[1]["message"] == message_2.model_dump()
 
     async def test_aget_keys(self, async_engine, chat_store):
         message_1 = [ChatMessage(content="First message", role="user")]
@@ -202,7 +202,7 @@ class TestAsyncPostgresChatStores:
 
         assert len(results) == 1
         result = results[0]
-        assert result["message"] == message_1[0].dict()
+        assert result["message"] == message_1[0].model_dump()
 
         message_2 = ChatMessage(content="Second message", role="user")
         message_3 = ChatMessage(content="Third message", role="user")
@@ -216,8 +216,8 @@ class TestAsyncPostgresChatStores:
         # Assert the previous messages are deleted and only the newest ones exist.
         assert len(results) == 2
 
-        assert results[0]["message"] == message_2.dict()
-        assert results[1]["message"] == message_3.dict()
+        assert results[0]["message"] == message_2.model_dump()
+        assert results[1]["message"] == message_3.model_dump()
 
     async def test_set_messages(self, chat_store):
         with pytest.raises(Exception, match=sync_method_exception_str):

@@ -115,6 +115,7 @@ Chat Store Usage
 A chat store serves as a centralized interface to store your chat history.
 
 .. code-block:: python
+
    from llama_index.core.memory import ChatMemoryBuffer
    from llama_index_cloud_sql_pg import PostgresChatStore, PostgresEngine
 
@@ -138,6 +139,7 @@ Document Reader Usage
 A Reader ingest data from different data sources and data formats into a simple `Document` representation.
 
 .. code-block:: python
+
    from llama_index.core.memory import ChatMemoryBuffer
    from llama_index_cloud_sql_pg import PostgresReader, PostgresEngine
 

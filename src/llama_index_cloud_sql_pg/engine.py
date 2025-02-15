@@ -762,16 +762,16 @@ class PostgresEngine:
         schema_name: str = "public",
         overwrite_existing: bool = False,
     ) -> None:
-        """
-        Create an table to save chat store.
+        """Create a table to save chat store.
+
         Args:
             table_name (str): The table name to store chat history.
             schema_name (str): The schema name to store the chat store table.
                 Default: "public".
             overwrite_existing (bool): Whether to drop existing table.
                 Default: False.
-        Returns:
-            None
+
+        Returns: None
         """
         if overwrite_existing:
             async with self._pool.connect() as conn:
@@ -797,16 +797,15 @@ class PostgresEngine:
         schema_name: str = "public",
         overwrite_existing: bool = False,
     ) -> None:
-        """
-        Create an table to save chat store.
+        """Create a table to save chat store.
+
         Args:
             table_name (str): The table name to store chat store.
             schema_name (str): The schema name to store the chat store table.
                 Default: "public".
             overwrite_existing (bool): Whether to drop existing table.
                 Default: False.
-        Returns:
-            None
+        Returns: None
         """
         await self._run_as_async(
             self._ainit_chat_store_table(
@@ -822,16 +821,16 @@ class PostgresEngine:
         schema_name: str = "public",
         overwrite_existing: bool = False,
     ) -> None:
-        """
-        Create an table to save chat store.
+        """Create a table to save chat store.
+
         Args:
             table_name (str): The table name to store chat store.
             schema_name (str): The schema name to store the chat store table.
                 Default: "public".
             overwrite_existing (bool): Whether to drop existing table.
                 Default: False.
-        Returns:
-            None
+
+        Returns: None
         """
         self._run_as_sync(
             self._ainit_chat_store_table(

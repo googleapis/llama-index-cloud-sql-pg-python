@@ -346,11 +346,7 @@ class PostgresDocumentStore(BaseDocumentStore):
     async def aget_all_document_hashes(self) -> dict[str, str]:
         """Get the stored hash for all documents.
 
-        Returns:
-            dict[
-              str,   # doc_hash
-              str    # doc_id
-            ]
+        Returns: A dictionary mapping document hashes to document IDs.
         """
         return await self._engine._run_as_async(
             self.__document_store.aget_all_document_hashes()
@@ -359,11 +355,7 @@ class PostgresDocumentStore(BaseDocumentStore):
     def get_all_document_hashes(self) -> dict[str, str]:
         """Get the stored hash for all documents.
 
-        Returns:
-            dict[
-              str,   # doc_hash
-              str    # doc_id
-            ]
+        Returns: A dictionary mapping document hashes to document IDs.
         """
         return self._engine._run_as_sync(
             self.__document_store.aget_all_document_hashes()
@@ -372,13 +364,7 @@ class PostgresDocumentStore(BaseDocumentStore):
     async def aget_all_ref_doc_info(self) -> Optional[dict[str, RefDocInfo]]:
         """Get a mapping of ref_doc_id -> RefDocInfo for all ingested documents.
 
-        Returns:
-            Optional[
-              dict[
-                str,          #Ref_doc_id
-                RefDocInfo,   #Ref_doc_info of the id
-              ]
-            ]
+        Returns: A dictionary mapping ref_doc_ids to `RefDocInfo` objects, or None if no documents have been ingested.
         """
         return await self._engine._run_as_async(
             self.__document_store.aget_all_ref_doc_info()
@@ -387,13 +373,7 @@ class PostgresDocumentStore(BaseDocumentStore):
     def get_all_ref_doc_info(self) -> Optional[dict[str, RefDocInfo]]:
         """Get a mapping of ref_doc_id -> RefDocInfo for all ingested documents.
 
-        Returns:
-            Optional[
-              dict[
-                str,          #Ref_doc_id
-                RefDocInfo,   #Ref_doc_info of the id
-              ]
-            ]
+        Returns: A dictionary mapping ref_doc_ids to `RefDocInfo` objects, or None if no documents have been ingested.
         """
         return self._engine._run_as_sync(self.__document_store.aget_all_ref_doc_info())
 

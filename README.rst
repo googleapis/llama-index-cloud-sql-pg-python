@@ -150,7 +150,7 @@ A Reader ingest data from different data sources and data formats into a simple 
    reader = await PostgresReader.create(
       engine=engine, table_name="my-db-table"
    )
-   documents = reader.load_data()
+   documents = await reader.aload_data()
 
 
 Document Store Usage

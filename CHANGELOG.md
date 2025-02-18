@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.1](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.2.0...v0.2.1) (2025-02-18)
+
+
+### Documentation
+
+* Add API reference docs ([#79](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/79)) ([985fb17](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/985fb17c1dc8032a2a857cdcbf386b0e54449c5b))
+* Adds a quickstart guide ([#71](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/71)) ([b3593be](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/b3593be7b5c4952fda06c108f7993f6441820f52))
+* Update connection pooling sample in readme ([#66](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/66)) ([f4bda52](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/f4bda52ebfb52d89606824de1a72d86f61b0533d))
+
 ## [0.2.0](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.1.0...v0.2.0) (2025-01-30)
 
 

@@ -3,6 +3,7 @@ Cloud SQL for PostgreSQL for LlamaIndex
 
 |preview| |pypi| |versions|
 
+- `Client Library Documentation`_
 - `Product Documentation`_
 
 The **Cloud SQL for PostgreSQL for LlamaIndex** package provides a first class experience for connecting to
@@ -18,6 +19,7 @@ Cloud SQL instances from the LlamaIndex ecosystem while providing the following 
    :target: https://pypi.org/project/llama-index-cloud-sql-pg/
 .. |versions| image:: https://img.shields.io/pypi/pyversions/llama-index-cloud-sql-pg.svg
    :target: https://pypi.org/project/llama-index-cloud-sql-pg/
+.. _Client Library Documentation: https://cloud.google.com/python/docs/reference/llama-index-cloud-sql-pg/latest
 .. _Product Documentation: https://cloud.google.com/sql/docs
 
 Quick Start

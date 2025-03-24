@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.2.1...v0.2.2) (2025-03-24)
+
+
+### Bug Fixes
+
+* **engine:** Closing of connection pool ([#95](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/95)) ([1ebaaac](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/1ebaaac6a93800edcf205920f2cdba6b77950fe4))
+
 ## [0.2.1](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.2.0...v0.2.1) (2025-02-18)
 
 

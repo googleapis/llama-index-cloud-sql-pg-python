@@ -1,4 +1,4 @@
-cloud-sql-python-connector[asyncpg]==1.17.0
+cloud-sql-python-connector[asyncpg]==1.18.1
 llama-index-core==0.12.32
 pgvector==0.4.0
 SQLAlchemy[asyncio]==2.0.40

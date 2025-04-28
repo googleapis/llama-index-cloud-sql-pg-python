@@ -99,7 +99,6 @@ class TestIndex:
         yield engine
         await aexecute(engine, f"DROP TABLE IF EXISTS {DEFAULT_TABLE}")
         await engine.close()
-        await engine._connector.close_async()
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):

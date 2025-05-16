@@ -149,14 +149,16 @@ class TestPostgresIndexStoreAsync:
         index_graph_struct = IndexGraph()
 
         await index_store.aadd_index_struct(index_dict_struct)
-        await index_store.aadd_index_struct(index_graph_struct)
+        await index_store.async_add_index_struct(index_graph_struct)
         await index_store.aadd_index_struct(index_list_struct)
 
         indexes = await index_store.aindex_structs()
+        indexes_with_async = await index_store.async_index_structs()
 
-        index_store.add_index_struct(index_dict_struct)
-        index_store.add_index_struct(index_graph_struct)
-        index_store.add_index_struct(index_list_struct)
+        assert indexes == indexes_with_async
+        assert index_dict_struct in indexes
+        assert index_list_struct in indexes
+        assert index_graph_struct in indexes
 
     async def test_warning(self, index_store):
         index_dict_struct = IndexDict()
@@ -270,9 +272,9 @@ class TestPostgresIndexStoreSync:
 
         indexes = index_store.index_structs()
 
-        index_store.add_index_struct(index_dict_struct)
-        index_store.add_index_struct(index_graph_struct)
-        index_store.add_index_struct(index_list_struct)
+        assert index_dict_struct in indexes
+        assert index_list_struct in indexes
+        assert index_graph_struct in indexes
 
     async def test_warning(self, index_store):
         index_dict_struct = IndexDict()

@@ -147,7 +147,7 @@ class TestAsyncPostgresIndexStore:
         index_graph_struct = IndexGraph()
 
         await index_store.aadd_index_struct(index_dict_struct)
-        await index_store.aadd_index_struct(index_graph_struct)
+        await index_store.async_add_index_struct(index_graph_struct)
         await index_store.aadd_index_struct(index_list_struct)
 
         indexes = await index_store.aindex_structs()

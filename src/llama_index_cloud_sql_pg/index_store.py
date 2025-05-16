@@ -96,6 +96,17 @@ class PostgresIndexStore(BaseIndexStore):
         index_store = engine._run_as_sync(coro)
         return cls(cls.__create_key, engine, index_store)
 
+    def add_index_struct(self, index_struct: IndexStruct) -> None:
+        """Add an index struct.
+
+        Args:
+            index_struct (IndexStruct): index struct
+
+        """
+        return self._engine._run_as_sync(
+            self.__index_store.aadd_index_struct(index_struct)
+        )
+
     async def aindex_structs(self) -> list[IndexStruct]:
         """Get all index structs.
 
@@ -125,16 +136,19 @@ class PostgresIndexStore(BaseIndexStore):
             self.__index_store.aadd_index_struct(index_struct)
         )
 
-    def add_index_struct(self, index_struct: IndexStruct) -> None:
-        """Add an index struct.
+    async def async_index_structs(self) -> list[IndexStruct]:
+        """Get all index structs.
+        Returns:
+            list[IndexStruct]: index structs
+        """
+        return await self.aindex_structs()
 
+    async def async_add_index_struct(self, index_struct: IndexStruct) -> None:
+        """Add an index struct.
         Args:
             index_struct (IndexStruct): index struct
-
         """
-        return self._engine._run_as_sync(
-            self.__index_store.aadd_index_struct(index_struct)
-        )
+        await self.aadd_index_struct(index_struct)
 
     async def adelete_index_struct(self, key: str) -> None:
         """Delete an index struct.

@@ -150,6 +150,20 @@ class AsyncPostgresIndexStore(BaseIndexStore):
         query = insert_query + values_statement + upsert_statement
         await self.__aexecute_query(query, index_row)
 
+    async def async_index_structs(self) -> list[IndexStruct]:
+        """Get all index structs.
+        Returns:
+            list[IndexStruct]: index structs
+        """
+        return await self.aindex_structs()
+
+    async def async_add_index_struct(self, index_struct: IndexStruct) -> None:
+        """Add an index struct.
+        Args:
+            index_struct (IndexStruct): index struct
+        """
+        await self.aadd_index_struct(index_struct)
+
     async def adelete_index_struct(self, key: str) -> None:
         """Delete an index struct.
 

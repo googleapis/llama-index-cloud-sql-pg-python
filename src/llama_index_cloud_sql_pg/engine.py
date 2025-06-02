@@ -385,7 +385,7 @@ class PostgresEngine:
             return await coro
         # Otherwise, run in the background thread
         return await asyncio.wrap_future(
-            asyncio.run_coroutine_threadsafe(coro, self._loop)
+            asyncio.run_coroutine_threadsafe(coro, self._loop)  # type: ignore
         )
 
     def _run_as_sync(self, coro: Awaitable[T]) -> T:
@@ -394,7 +394,7 @@ class PostgresEngine:
             raise Exception(
                 "Engine was initialized without a background loop and cannot call sync methods."
             )
-        return asyncio.run_coroutine_threadsafe(coro, self._loop).result()
+        return asyncio.run_coroutine_threadsafe(coro, self._loop).result()  # type: ignore
 
     async def close(self) -> None:
         """Dispose of connection pool"""

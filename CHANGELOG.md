@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.2.2...v0.2.3) (2025-06-18)
+
+
+### Bug Fixes
+
+* Index store adds interface methods ([#118](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/118)) ([72bc93d](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/72bc93de709197f4006087e866dfcaa38a2a220f))
+
 ## [0.2.2](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.2.1...v0.2.2) (2025-03-24)
 
 

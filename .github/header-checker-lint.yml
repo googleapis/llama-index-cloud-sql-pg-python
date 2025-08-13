@@ -35,7 +35,7 @@ ignoreFiles:
   - ".github/header-checker-lint.yml"
   - ".github/sync-repo-settings.yaml"
   - ".github/workflows/docs.yml"
-   - ".github/workflows/labeler.yml"
+  - ".github/workflows/labeler.yml"
   - ".kokoro/**"
   - "**/requirements.txt"
   - "**/requirements*.txt"

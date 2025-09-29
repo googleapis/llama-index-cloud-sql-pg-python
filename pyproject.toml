@@ -38,10 +38,10 @@ Changelog = "https://github.com/googleapis/llama-index-cloud-sql-pg-python/blob/
 
 [project.optional-dependencies]
 test = [
-    "black[jupyter]==25.1.0",
+    "black[jupyter]==25.9.0",
     "isort==6.0.1",
-    "mypy==1.17.1",
-    "pytest-asyncio==1.1.0",
+    "mypy==1.18.2",
+    "pytest-asyncio==1.2.0",
     "pytest==8.4.2",
     "pytest-cov==7.0.0"
 ]

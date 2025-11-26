@@ -66,13 +66,6 @@
         "minor",
         "patch"
       ],
-    },
-    {
-      "description": "Disable isort updates for python <=3.9 in pyproject.toml",
-      "matchFileNames": ["pyproject.toml"],
-      "matchPackageNames": ["isort"],
-      "matchCurrentValue": "==6.1.0",
-      "enabled": false
     }
   ],
 }

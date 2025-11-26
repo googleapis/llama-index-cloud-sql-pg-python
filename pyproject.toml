@@ -4,7 +4,7 @@ dynamic = ["version"]
 description = "LlamaIndex integrations for Google Cloud SQL for PostgreSQL"
 readme = "README.rst"
 license = {file = "LICENSE"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     {name = "Google LLC", email = "googleapis-packages@google.com"}
 ]
@@ -21,10 +21,10 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 [tool.setuptools.dynamic]
@@ -39,8 +39,7 @@ Changelog = "https://github.com/googleapis/llama-index-cloud-sql-pg-python/blob/
 [project.optional-dependencies]
 test = [
     "black[jupyter]==25.9.0",
-    "isort==6.1.0; python_version == '3.9'",
-    "isort==7.0.0; python_version >= '3.10'",
+    "isort==7.0.0",
     "mypy==1.18.2",
     "pytest-asyncio==1.2.0",
     "pytest==8.4.2",
@@ -55,13 +54,13 @@ build-backend = "setuptools.build_meta"
 asyncio_default_fixture_loop_scope = "class"
 
 [tool.black]
-target-version = ['py39']
+target-version = ['py310']
 
 [tool.isort]
 profile = "black"
 
 [tool.mypy]
-python_version = 3.9
+python_version = 3.10
 warn_unused_configs = true
 disallow_incomplete_defs = true
 

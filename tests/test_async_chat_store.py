@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import asyncio
 import os
 import uuid
-from typing import Sequence
+from typing import Sequence, Any, Coroutine
 
 import pytest
 import pytest_asyncio
@@ -28,18 +28,35 @@ default_table_name_async = "chat_store_" + str(uuid.uuid4())
 sync_method_exception_str = "Sync methods are not implemented for AsyncPostgresChatStore. Use PostgresChatStore interface instead."
 
 
+# Helper to bridge the Main Test Loop and the Engine Background Loop
+async def run_on_background(engine: PostgresEngine, coro: Coroutine) -> Any:
+    """Runs a coroutine on the engine's background loop."""
+    if engine._loop:
+        return await asyncio.wrap_future(
+            asyncio.run_coroutine_threadsafe(coro, engine._loop)
+        )
+    return await coro
+
+
 async def aexecute(engine: PostgresEngine, query: str) -> None:
-    async with engine._pool.connect() as conn:
-        await conn.execute(text(query))
-        await conn.commit()
+    async def _impl():
+        async with engine._pool.connect() as conn:
+            await conn.execute(text(query))
+            await conn.commit()
+
+    await run_on_background(engine, _impl())
 
 
 async def afetch(engine: PostgresEngine, query: str) -> Sequence[RowMapping]:
-    async with engine._pool.connect() as conn:
-        result = await conn.execute(text(query))
-        result_map = result.mappings()
-        result_fetch = result_map.fetchall()
-    return result_fetch
+    async def _impl():
+        async with engine._pool.connect() as conn:
+            result = await conn.execute(text(query))
+            result_map = result.mappings()
+            result_fetch = result_map.fetchall()
+        return result_fetch
+
+    result = await run_on_background(engine, _impl())
+    return result
 
 
 def get_env_var(key: str, desc: str) -> str:
@@ -96,8 +113,12 @@ class TestAsyncPostgresChatStores:
 
     @pytest_asyncio.fixture(scope="class")
     async def chat_store(self, async_engine):
-        await async_engine._ainit_chat_store_table(table_name=default_table_name_async)
-
+        await run_on_background(
+            async_engine,
+            await async_engine._ainit_chat_store_table(
+                table_name=default_table_name_async
+            ),
+        )
         chat_store = await AsyncPostgresChatStore.create(
             engine=async_engine, table_name=default_table_name_async
         )

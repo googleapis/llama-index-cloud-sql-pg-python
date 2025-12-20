@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import asyncio
+from typing import Any, Coroutine
 import os
 import uuid
 
@@ -56,10 +57,23 @@ def get_env_var(key: str, desc: str) -> str:
     return v
 
 
+# Helper to bridge the Main Test Loop and the Engine Background Loop
+async def run_on_background(engine: PostgresEngine, coro: Coroutine) -> Any:
+    """Runs a coroutine on the engine's background loop."""
+    if engine._loop:
+        return await asyncio.wrap_future(
+            asyncio.run_coroutine_threadsafe(coro, engine._loop)
+        )
+    return await coro
+
+
 async def aexecute(engine: PostgresEngine, query: str) -> None:
-    async with engine._pool.connect() as conn:
-        await conn.execute(text(query))
-        await conn.commit()
+    async def _impl():
+        async with engine._pool.connect() as conn:
+            await conn.execute(text(query))
+            await conn.commit()
+
+    await run_on_background(engine, _impl())
 
 
 @pytest.mark.asyncio(loop_scope="class")
@@ -102,8 +116,11 @@ class TestIndex:
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):
-        await engine._ainit_vector_store_table(
-            DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
+        await run_on_background(
+            engine,
+            engine._ainit_vector_store_table(
+                DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
+            ),
         )
         vs = await AsyncPostgresVectorStore.create(
             engine,

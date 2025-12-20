@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import os
 import uuid
 import warnings
-from typing import Sequence
+from typing import Sequence, Any, Coroutine
 
 import pytest
 import pytest_asyncio
@@ -60,18 +61,35 @@ def get_env_var(key: str, desc: str) -> str:
     return v
 
 
+# Helper to bridge the Main Test Loop and the Engine Background Loop
+async def run_on_background(engine: PostgresEngine, coro: Coroutine) -> Any:
+    """Runs a coroutine on the engine's background loop."""
+    if engine._loop:
+        return await asyncio.wrap_future(
+            asyncio.run_coroutine_threadsafe(coro, engine._loop)
+        )
+    return await coro
+
+
 async def aexecute(engine: PostgresEngine, query: str) -> None:
-    async with engine._pool.connect() as conn:
-        await conn.execute(text(query))
-        await conn.commit()
+    async def _impl():
+        async with engine._pool.connect() as conn:
+            await conn.execute(text(query))
+            await conn.commit()
+
+    await run_on_background(engine, _impl())
 
 
 async def afetch(engine: PostgresEngine, query: str) -> Sequence[RowMapping]:
-    async with engine._pool.connect() as conn:
-        result = await conn.execute(text(query))
-        result_map = result.mappings()
-        result_fetch = result_map.fetchall()
-    return result_fetch
+    async def _impl():
+        async with engine._pool.connect() as conn:
+            result = await conn.execute(text(query))
+            result_map = result.mappings()
+            result_fetch = result_map.fetchall()
+        return result_fetch
+
+    result = await run_on_background(engine, _impl())
+    return result
 
 
 @pytest.mark.asyncio(loop_scope="class")
@@ -116,31 +134,37 @@ class TestVectorStore:
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):
-        await engine._ainit_vector_store_table(
-            DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
+        await run_on_background(
+            engine,
+            engine._ainit_vector_store_table(
+                DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
+            ),
         )
         vs = await AsyncPostgresVectorStore.create(engine, table_name=DEFAULT_TABLE)
         yield vs
 
     @pytest_asyncio.fixture(scope="class")
     async def custom_vs(self, engine):
-        await engine._ainit_vector_store_table(
-            DEFAULT_TABLE_CUSTOM_VS,
-            VECTOR_SIZE,
-            overwrite_existing=True,
-            metadata_columns=[
-                Column(name="len", data_type="INTEGER", nullable=False),
-                Column(
-                    name="nullable_int_field",
-                    data_type="INTEGER",
-                    nullable=True,
-                ),
-                Column(
-                    name="nullable_str_field",
-                    data_type="VARCHAR",
-                    nullable=True,
-                ),
-            ],
+        await run_on_background(
+            engine,
+            engine._ainit_vector_store_table(
+                DEFAULT_TABLE_CUSTOM_VS,
+                VECTOR_SIZE,
+                overwrite_existing=True,
+                metadata_columns=[
+                    Column(name="len", data_type="INTEGER", nullable=False),
+                    Column(
+                        name="nullable_int_field",
+                        data_type="INTEGER",
+                        nullable=True,
+                    ),
+                    Column(
+                        name="nullable_str_field",
+                        data_type="VARCHAR",
+                        nullable=True,
+                    ),
+                ],
+            ),
         )
         vs = await AsyncPostgresVectorStore.create(
             engine,

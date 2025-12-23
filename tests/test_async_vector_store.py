@@ -246,7 +246,7 @@ class TestVectorStore:
             )
 
     async def test_async_add(self, engine, vs):
-        await vs.async_add(nodes)
+        await run_on_background(engine, vs.async_add(nodes))
 
         results = await afetch(engine, f'SELECT * FROM "{DEFAULT_TABLE}"')
         assert len(results) == 4
@@ -256,7 +256,7 @@ class TestVectorStore:
         for node in nodes:
             node.metadata["len"] = len(node.text)
 
-        await custom_vs.async_add(nodes)
+        await run_on_background(engine, custom_vs.async_add(nodes))
 
         results = await afetch(engine, f'SELECT * FROM "{DEFAULT_TABLE_CUSTOM_VS}"')
         assert len(results) == 4
@@ -268,8 +268,8 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_async_add
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
-        await vs.adelete(nodes[0].node_id)
+        await run_on_background(engine, vs.async_add(nodes))
+        await run_on_background(engine, vs.adelete(nodes[0].node_id))
 
         results = await afetch(engine, f'SELECT * FROM "{DEFAULT_TABLE}"')
         assert len(results) == 3
@@ -278,19 +278,24 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_async_add
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
-        await vs.adelete_nodes(
-            node_ids=[nodes[0].node_id, nodes[1].node_id],
-            filters=MetadataFilters(
-                filters=[
-                    MetadataFilter(
-                        key="text",
-                        value="foo",
-                        operator=FilterOperator.TEXT_MATCH,
-                    ),
-                    MetadataFilter(key="text", value="bar", operator=FilterOperator.EQ),
-                ],
-                condition=FilterCondition.OR,
+        await run_on_background(engine, vs.async_add(nodes))
+        await run_on_background(
+            engine,
+            vs.adelete_nodes(
+                node_ids=[nodes[0].node_id, nodes[1].node_id],
+                filters=MetadataFilters(
+                    filters=[
+                        MetadataFilter(
+                            key="text",
+                            value="foo",
+                            operator=FilterOperator.TEXT_MATCH,
+                        ),
+                        MetadataFilter(
+                            key="text", value="bar", operator=FilterOperator.EQ
+                        ),
+                    ],
+                    condition=FilterCondition.OR,
+                ),
             ),
         )
 
@@ -301,23 +306,26 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_async_add
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
-        results = await vs.aget_nodes(
-            filters=MetadataFilters(
-                filters=[
-                    MetadataFilter(
-                        key="text",
-                        value="foo",
-                        operator=FilterOperator.TEXT_MATCH,
-                    ),
-                    MetadataFilter(
-                        key="text",
-                        value="bar",
-                        operator=FilterOperator.TEXT_MATCH,
-                    ),
-                ],
-                condition=FilterCondition.AND,
-            )
+        await run_on_background(engine, vs.async_add(nodes))
+        results = await run_on_background(
+            engine,
+            vs.aget_nodes(
+                filters=MetadataFilters(
+                    filters=[
+                        MetadataFilter(
+                            key="text",
+                            value="foo",
+                            operator=FilterOperator.TEXT_MATCH,
+                        ),
+                        MetadataFilter(
+                            key="text",
+                            value="bar",
+                            operator=FilterOperator.TEXT_MATCH,
+                        ),
+                    ],
+                    condition=FilterCondition.AND,
+                )
+            ),
         )
 
         assert len(results) == 1
@@ -327,11 +335,11 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_async_add
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
+        await run_on_background(engine, vs.async_add(nodes))
         query = VectorStoreQuery(
             query_embedding=[1.0] * VECTOR_SIZE, similarity_top_k=3
         )
-        results = await vs.aquery(query)
+        results = await run_on_background(engine, vs.aquery(query))
 
         assert results.nodes is not None
         assert results.ids is not None
@@ -347,7 +355,7 @@ class TestVectorStore:
         for node in nodes:
             node.metadata["len"] = len(node.text)
 
-        await custom_vs.async_add(nodes)
+        await run_on_background(engine, custom_vs.async_add(nodes))
 
         filters = MetadataFilters(
             filters=[
@@ -407,8 +415,8 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_adelete
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
-        await vs.aclear()
+        await run_on_background(engine, vs.async_add(nodes))
+        await run_on_background(engine, vs.aclear())
 
         results = await afetch(engine, f'SELECT * FROM "{DEFAULT_TABLE}"')
         assert len(results) == 0

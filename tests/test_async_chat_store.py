@@ -115,9 +115,7 @@ class TestAsyncPostgresChatStores:
     async def chat_store(self, async_engine):
         await run_on_background(
             async_engine,
-            await async_engine._ainit_chat_store_table(
-                table_name=default_table_name_async
-            ),
+            async_engine._ainit_chat_store_table(table_name=default_table_name_async),
         )
         chat_store = await AsyncPostgresChatStore.create(
             engine=async_engine, table_name=default_table_name_async
@@ -138,21 +136,23 @@ class TestAsyncPostgresChatStores:
         key = "test_add_key"
 
         message = ChatMessage(content="add_message_test", role="user")
-        await chat_store.async_add_message(key, message=message)
+        await run_on_background(
+            async_engine, chat_store.async_add_message(key, message=message)
+        )
 
         query = f"""select * from "public"."{default_table_name_async}" where key = '{key}';"""
         results = await afetch(async_engine, query)
         result = results[0]
         assert result["message"] == message.model_dump()
 
-    async def test_aset_and_aget_messages(self, chat_store):
+    async def test_aset_and_aget_messages(self, async_engine, chat_store):
         message_1 = ChatMessage(content="First message", role="user")
         message_2 = ChatMessage(content="Second message", role="user")
         messages = [message_1, message_2]
         key = "test_set_and_get_key"
-        await chat_store.aset_messages(key, messages)
+        await run_on_background(async_engine, chat_store.aset_messages(key, messages))
 
-        results = await chat_store.aget_messages(key)
+        results = await run_on_background(async_engine, chat_store.aget_messages(key))
 
         assert len(results) == 2
         assert results[0].content == message_1.content
@@ -161,9 +161,9 @@ class TestAsyncPostgresChatStores:
     async def test_adelete_messages(self, async_engine, chat_store):
         messages = [ChatMessage(content="Message to delete", role="user")]
         key = "test_delete_key"
-        await chat_store.aset_messages(key, messages)
+        await run_on_background(async_engine, chat_store.aset_messages(key, messages))
 
-        await chat_store.adelete_messages(key)
+        await run_on_background(async_engine, chat_store.adelete_messages(key))
         query = f"""select * from "public"."{default_table_name_async}" where key = '{key}' ORDER BY id;"""
         results = await afetch(async_engine, query)
 
@@ -174,9 +174,9 @@ class TestAsyncPostgresChatStores:
         message_2 = ChatMessage(content="Delete me", role="user")
         messages = [message_1, message_2]
         key = "test_delete_message_key"
-        await chat_store.aset_messages(key, messages)
+        await run_on_background(async_engine, chat_store.aset_messages(key, messages))
 
-        await chat_store.adelete_message(key, 1)
+        await run_on_background(async_engine, chat_store.adelete_message(key, 1))
         query = f"""select * from "public"."{default_table_name_async}" where key = '{key}' ORDER BY id;"""
         results = await afetch(async_engine, query)
 
@@ -189,9 +189,9 @@ class TestAsyncPostgresChatStores:
         message_3 = ChatMessage(content="Message 3", role="user")
         messages = [message_1, message_2, message_3]
         key = "test_delete_last_message_key"
-        await chat_store.aset_messages(key, messages)
+        await run_on_background(async_engine, chat_store.aset_messages(key, messages))
 
-        await chat_store.adelete_last_message(key)
+        await run_on_background(async_engine, chat_store.adelete_last_message(key))
         query = f"""select * from "public"."{default_table_name_async}" where key = '{key}' ORDER BY id;"""
         results = await afetch(async_engine, query)
 
@@ -204,10 +204,14 @@ class TestAsyncPostgresChatStores:
         message_2 = [ChatMessage(content="Second message", role="user")]
         key_1 = "key1"
         key_2 = "key2"
-        await chat_store.aset_messages(key_1, message_1)
-        await chat_store.aset_messages(key_2, message_2)
+        await run_on_background(
+            async_engine, chat_store.aset_messages(key_1, message_1)
+        )
+        await run_on_background(
+            async_engine, chat_store.aset_messages(key_2, message_2)
+        )
 
-        keys = await chat_store.aget_keys()
+        keys = await run_on_background(async_engine, chat_store.aget_keys())
 
         assert key_1 in keys
         assert key_2 in keys
@@ -215,7 +219,7 @@ class TestAsyncPostgresChatStores:
     async def test_set_exisiting_key(self, async_engine, chat_store):
         message_1 = [ChatMessage(content="First message", role="user")]
         key = "test_set_exisiting_key"
-        await chat_store.aset_messages(key, message_1)
+        await run_on_background(async_engine, chat_store.aset_messages(key, message_1))
 
         query = f"""select * from "public"."{default_table_name_async}" where key = '{key}';"""
         results = await afetch(async_engine, query)
@@ -228,7 +232,7 @@ class TestAsyncPostgresChatStores:
         message_3 = ChatMessage(content="Third message", role="user")
         messages = [message_2, message_3]
 
-        await chat_store.aset_messages(key, messages)
+        await run_on_background(async_engine, chat_store.aset_messages(key, messages))
 
         query = f"""select * from "public"."{default_table_name_async}" where key = '{key}';"""
         results = await afetch(async_engine, query)

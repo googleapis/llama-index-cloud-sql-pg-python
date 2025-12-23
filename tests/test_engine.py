@@ -162,7 +162,7 @@ class TestEngineAsync:
         user,
         password,
     ):
-        async with Connector() as connector:
+        async with Connector(loop=asyncio.get_running_loop()) as connector:
 
             async def getconn() -> asyncpg.Connection:
                 conn = await connector.connect_async(  # type: ignore

@@ -140,36 +140,50 @@ class TestAsyncPostgresIndexStore:
         index_struct = IndexGraph()
         index_id = index_struct.index_id
         index_type = index_struct.get_type()
-        await index_store.aadd_index_struct(index_struct)
+        await run_on_background(
+            async_engine, index_store.aadd_index_struct(index_struct)
+        )
 
         query = f"""select * from "public"."{default_table_name_async}" where index_id = '{index_id}';"""
         results = await afetch(async_engine, query)
         result = results[0]
         assert result.get("type") == index_type
 
-        await index_store.adelete_index_struct(index_id)
+        await run_on_background(
+            async_engine, index_store.adelete_index_struct(index_id)
+        )
         query = f"""select * from "public"."{default_table_name_async}" where index_id = '{index_id}';"""
         results = await afetch(async_engine, query)
         assert results == []
 
-    async def test_get_index(self, index_store):
+    async def test_get_index(self, index_store, async_engine):
         index_struct = IndexGraph()
         index_id = index_struct.index_id
         index_type = index_struct.get_type()
-        await index_store.aadd_index_struct(index_struct)
+        await run_on_background(
+            async_engine, index_store.aadd_index_struct(index_struct)
+        )
 
-        ind_struct = await index_store.aget_index_struct(index_id)
+        ind_struct = await run_on_background(
+            async_engine, index_store.aget_index_struct(index_id)
+        )
 
         assert index_struct == ind_struct
 
-    async def test_aindex_structs(self, index_store):
+    async def test_aindex_structs(self, index_store, async_engine):
         index_dict_struct = IndexDict()
         index_list_struct = IndexList()
         index_graph_struct = IndexGraph()
 
-        await index_store.aadd_index_struct(index_dict_struct)
-        await index_store.async_add_index_struct(index_graph_struct)
-        await index_store.aadd_index_struct(index_list_struct)
+        await run_on_background(
+            async_engine, index_store.aadd_index_struct(index_dict_struct)
+        )
+        await run_on_background(
+            async_engine, index_store.async_add_index_struct(index_graph_struct)
+        )
+        await run_on_background(
+            async_engine, index_store.aadd_index_struct(index_list_struct)
+        )
 
         indexes = await index_store.aindex_structs()
 
@@ -177,16 +191,21 @@ class TestAsyncPostgresIndexStore:
         assert index_list_struct in indexes
         assert index_graph_struct in indexes
 
-    async def test_warning(self, index_store):
+    async def test_warning(self, index_store, async_engine):
         index_dict_struct = IndexDict()
         index_list_struct = IndexList()
 
-        await index_store.aadd_index_struct(index_dict_struct)
-        await index_store.aadd_index_struct(index_list_struct)
+        await run_on_background(
+            async_engine, index_store.aadd_index_struct(index_dict_struct)
+        )
+        await run_on_background(
+            async_engine, index_store.aadd_index_struct(index_list_struct)
+        )
 
         with warnings.catch_warnings(record=True) as w:
-            index_struct = await index_store.aget_index_struct()
-
+            index_struct = await run_on_background(
+                async_engine, index_store.aget_index_struct()
+            )
             assert len(w) == 1
             assert "No struct_id specified and more than one struct exists." in str(
                 w[-1].message

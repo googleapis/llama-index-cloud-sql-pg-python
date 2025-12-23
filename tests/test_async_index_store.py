@@ -16,7 +16,7 @@ import asyncio
 import os
 import uuid
 import warnings
-from typing import Sequence, Any, Coroutine
+from typing import Any, Coroutine, Sequence
 
 import pytest
 import pytest_asyncio

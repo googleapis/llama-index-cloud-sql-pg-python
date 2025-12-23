@@ -15,7 +15,7 @@
 import asyncio
 import os
 import uuid
-from typing import Sequence, Any, Coroutine
+from typing import Any, Coroutine, Sequence
 
 import asyncpg  # type: ignore
 import pytest

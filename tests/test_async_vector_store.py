@@ -140,7 +140,9 @@ class TestVectorStore:
                 DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
             ),
         )
-        vs = await AsyncPostgresVectorStore.create(engine, table_name=DEFAULT_TABLE)
+        vs = await run_on_background(
+            engine, AsyncPostgresVectorStore.create(engine, table_name=DEFAULT_TABLE)
+        )
         yield vs
 
     @pytest_asyncio.fixture(scope="class")
@@ -166,14 +168,17 @@ class TestVectorStore:
                 ],
             ),
         )
-        vs = await AsyncPostgresVectorStore.create(
+        vs = await run_on_background(
             engine,
-            table_name=DEFAULT_TABLE_CUSTOM_VS,
-            metadata_columns=[
-                "len",
-                "nullable_int_field",
-                "nullable_str_field",
-            ],
+            AsyncPostgresVectorStore.create(
+                engine,
+                table_name=DEFAULT_TABLE_CUSTOM_VS,
+                metadata_columns=[
+                    "len",
+                    "nullable_int_field",
+                    "nullable_str_field",
+                ],
+            ),
         )
         yield vs
 
@@ -187,8 +192,11 @@ class TestVectorStore:
         with pytest.raises(
             Exception, match=f"Id column, {test_id_column}, does not exist."
         ):
-            await AsyncPostgresVectorStore.create(
-                engine, table_name=DEFAULT_TABLE, id_column=test_id_column
+            await run_on_background(
+                engine,
+                AsyncPostgresVectorStore.create(
+                    engine, table_name=DEFAULT_TABLE, id_column=test_id_column
+                ),
             )
 
     async def test_validate_text_column_create(self, engine, vs):
@@ -196,8 +204,11 @@ class TestVectorStore:
         with pytest.raises(
             Exception, match=f"Text column, {test_text_column}, does not exist."
         ):
-            await AsyncPostgresVectorStore.create(
-                engine, table_name=DEFAULT_TABLE, text_column=test_text_column
+            await run_on_background(
+                engine,
+                AsyncPostgresVectorStore.create(
+                    engine, table_name=DEFAULT_TABLE, text_column=test_text_column
+                ),
             )
 
     async def test_validate_embedding_column_create(self, engine, vs):
@@ -206,10 +217,13 @@ class TestVectorStore:
             Exception,
             match=f"Embedding column, {test_embed_column}, does not exist.",
         ):
-            await AsyncPostgresVectorStore.create(
+            await run_on_background(
                 engine,
-                table_name=DEFAULT_TABLE,
-                embedding_column=test_embed_column,
+                AsyncPostgresVectorStore.create(
+                    engine,
+                    table_name=DEFAULT_TABLE,
+                    embedding_column=test_embed_column,
+                ),
             )
 
     async def test_validate_node_column_create(self, engine, vs):
@@ -217,8 +231,11 @@ class TestVectorStore:
         with pytest.raises(
             Exception, match=f"Node column, {test_node_column}, does not exist."
         ):
-            await AsyncPostgresVectorStore.create(
-                engine, table_name=DEFAULT_TABLE, node_column=test_node_column
+            await run_on_background(
+                engine,
+                AsyncPostgresVectorStore.create(
+                    engine, table_name=DEFAULT_TABLE, node_column=test_node_column
+                ),
             )
 
     async def test_validate_ref_doc_id_column_create(self, engine, vs):
@@ -227,10 +244,13 @@ class TestVectorStore:
             Exception,
             match=f"Reference Document Id column, {test_ref_doc_id_column}, does not exist.",
         ):
-            await AsyncPostgresVectorStore.create(
+            await run_on_background(
                 engine,
-                table_name=DEFAULT_TABLE,
-                ref_doc_id_column=test_ref_doc_id_column,
+                AsyncPostgresVectorStore.create(
+                    engine,
+                    table_name=DEFAULT_TABLE,
+                    ref_doc_id_column=test_ref_doc_id_column,
+                ),
             )
 
     async def test_validate_metadata_json_column_create(self, engine, vs):
@@ -239,10 +259,13 @@ class TestVectorStore:
             Exception,
             match=f"Metadata column, {test_metadata_json_column}, does not exist.",
         ):
-            await AsyncPostgresVectorStore.create(
+            await run_on_background(
                 engine,
-                table_name=DEFAULT_TABLE,
-                metadata_json_column=test_metadata_json_column,
+                AsyncPostgresVectorStore.create(
+                    engine,
+                    table_name=DEFAULT_TABLE,
+                    metadata_json_column=test_metadata_json_column,
+                ),
             )
 
     async def test_async_add(self, engine, vs):

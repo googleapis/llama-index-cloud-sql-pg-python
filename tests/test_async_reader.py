@@ -134,41 +134,56 @@ class TestAsyncPostgresReader:
 
     async def test_create_reader_with_invalid_parameters(self, async_engine):
         with pytest.raises(ValueError):
-            await AsyncPostgresReader.create(
-                engine=async_engine,
+            await run_on_background(
+                async_engine,
+                AsyncPostgresReader.create(
+                    engine=async_engine,
+                ),
             )
         with pytest.raises(ValueError):
 
             def fake_formatter():
                 return None
 
-            await AsyncPostgresReader.create(
-                engine=async_engine,
-                table_name=default_table_name_async,
-                format="text",
-                formatter=fake_formatter,
+            await run_on_background(
+                async_engine,
+                AsyncPostgresReader.create(
+                    engine=async_engine,
+                    table_name=default_table_name_async,
+                    format="text",
+                    formatter=fake_formatter,
+                ),
             )
         with pytest.raises(ValueError):
-            await AsyncPostgresReader.create(
-                engine=async_engine,
-                table_name=default_table_name_async,
-                format="fake_format",
+            await run_on_background(
+                async_engine,
+                AsyncPostgresReader.create(
+                    engine=async_engine,
+                    table_name=default_table_name_async,
+                    format="fake_format",
+                ),
             )
 
     async def test_lazy_load_data(self, async_engine):
         with pytest.raises(Exception, match=sync_method_exception_str):
-            reader = await AsyncPostgresReader.create(
-                engine=async_engine,
-                table_name=default_table_name_async,
+            reader = await run_on_background(
+                async_engine,
+                AsyncPostgresReader.create(
+                    engine=async_engine,
+                    table_name=default_table_name_async,
+                ),
             )
 
             reader.lazy_load_data()
 
     async def test_load_data(self, async_engine):
         with pytest.raises(Exception, match=sync_method_exception_str):
-            reader = await AsyncPostgresReader.create(
-                engine=async_engine,
-                table_name=default_table_name_async,
+            reader = await run_on_background(
+                async_engine,
+                AsyncPostgresReader.create(
+                    engine=async_engine,
+                    table_name=default_table_name_async,
+                ),
             )
 
             reader.load_data()
@@ -194,9 +209,12 @@ class TestAsyncPostgresReader:
         """
         await aexecute(async_engine, insert_query)
 
-        reader = await AsyncPostgresReader.create(
-            engine=async_engine,
-            table_name=table_name,
+        reader = await run_on_background(
+            async_engine,
+            AsyncPostgresReader.create(
+                engine=async_engine,
+                table_name=table_name,
+            ),
         )
 
         documents = await self._collect_async_items(reader.alazy_load_data())
@@ -255,17 +273,20 @@ class TestAsyncPostgresReader:
         """
         await aexecute(async_engine, insert_query)
 
-        reader = await AsyncPostgresReader.create(
-            engine=async_engine,
-            query=f'SELECT * FROM "{table_name}";',
-            content_columns=[
-                "fruit_name",
-                "variety",
-                "quantity_in_stock",
-                "price_per_unit",
-                "organic",
-            ],
-            metadata_columns=["fruit_id"],
+        reader = await run_on_background(
+            async_engine,
+            AsyncPostgresReader.create(
+                engine=async_engine,
+                query=f'SELECT * FROM "{table_name}";',
+                content_columns=[
+                    "fruit_name",
+                    "variety",
+                    "quantity_in_stock",
+                    "price_per_unit",
+                    "organic",
+                ],
+                metadata_columns=["fruit_id"],
+            ),
         )
 
         documents = await self._collect_async_items(reader.alazy_load_data())
@@ -299,14 +320,17 @@ class TestAsyncPostgresReader:
         """
         await aexecute(async_engine, insert_query)
 
-        reader = await AsyncPostgresReader.create(
-            engine=async_engine,
-            query=f'SELECT * FROM "{table_name}";',
-            content_columns=[
-                "variety",
-                "quantity_in_stock",
-                "price_per_unit",
-            ],
+        reader = await run_on_background(
+            async_engine,
+            AsyncPostgresReader.create(
+                engine=async_engine,
+                query=f'SELECT * FROM "{table_name}";',
+                content_columns=[
+                    "variety",
+                    "quantity_in_stock",
+                    "price_per_unit",
+                ],
+            ),
         )
 
         documents = await self._collect_async_items(reader.alazy_load_data())
@@ -322,15 +346,18 @@ class TestAsyncPostgresReader:
             assert expected.text == actual.text
             assert expected.metadata == actual.metadata
 
-        reader = await AsyncPostgresReader.create(
-            engine=async_engine,
-            query=f'SELECT * FROM "{table_name}";',
-            content_columns=[
-                "variety",
-                "quantity_in_stock",
-                "price_per_unit",
-            ],
-            format="JSON",
+        reader = await run_on_background(
+            async_engine,
+            AsyncPostgresReader.create(
+                engine=async_engine,
+                query=f'SELECT * FROM "{table_name}";',
+                content_columns=[
+                    "variety",
+                    "quantity_in_stock",
+                    "price_per_unit",
+                ],
+                format="JSON",
+            ),
         )
 
         actual_documents = await self._collect_async_items(reader.alazy_load_data())
@@ -375,12 +402,15 @@ class TestAsyncPostgresReader:
             VALUES ('Apple', '{variety}', 150, 1, '{metadata}');"""
         await aexecute(async_engine, insert_query)
 
-        reader = await AsyncPostgresReader.create(
-            engine=async_engine,
-            query=f'SELECT * FROM "{table_name}";',
-            metadata_columns=[
-                "variety",
-            ],
+        reader = await run_on_background(
+            async_engine,
+            AsyncPostgresReader.create(
+                engine=async_engine,
+                query=f'SELECT * FROM "{table_name}";',
+                metadata_columns=[
+                    "variety",
+                ],
+            ),
         )
 
         documents = await self._collect_async_items(reader.alazy_load_data())
@@ -429,15 +459,18 @@ class TestAsyncPostgresReader:
                 str(row[column]) for column in content_columns if column in row
             )
 
-        reader = await AsyncPostgresReader.create(
-            engine=async_engine,
-            query=f'SELECT * FROM "{table_name}";',
-            content_columns=[
-                "variety",
-                "quantity_in_stock",
-                "price_per_unit",
-            ],
-            formatter=my_formatter,
+        reader = await run_on_background(
+            async_engine,
+            AsyncPostgresReader.create(
+                engine=async_engine,
+                query=f'SELECT * FROM "{table_name}";',
+                content_columns=[
+                    "variety",
+                    "quantity_in_stock",
+                    "price_per_unit",
+                ],
+                formatter=my_formatter,
+            ),
         )
 
         documents = await self._collect_async_items(reader.alazy_load_data())
@@ -481,15 +514,18 @@ class TestAsyncPostgresReader:
                     """
         await aexecute(async_engine, insert_query)
 
-        reader = await AsyncPostgresReader.create(
-            engine=async_engine,
-            query=f'SELECT * FROM "{table_name}";',
-            content_columns=[
-                "variety",
-                "quantity_in_stock",
-                "price_per_unit",
-            ],
-            format="YAML",
+        reader = await run_on_background(
+            async_engine,
+            AsyncPostgresReader.create(
+                engine=async_engine,
+                query=f'SELECT * FROM "{table_name}";',
+                content_columns=[
+                    "variety",
+                    "quantity_in_stock",
+                    "price_per_unit",
+                ],
+                format="YAML",
+            ),
         )
 
         documents = await self._collect_async_items(reader.alazy_load_data())

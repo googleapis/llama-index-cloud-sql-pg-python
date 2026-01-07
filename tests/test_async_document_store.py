@@ -116,8 +116,11 @@ class TestAsyncPostgresDocumentStore:
             async_engine._ainit_doc_store_table(table_name=default_table_name_async),
         )
 
-        doc_store = await AsyncPostgresDocumentStore.create(
-            engine=async_engine, table_name=default_table_name_async
+        doc_store = await run_on_background(
+            async_engine,
+            AsyncPostgresDocumentStore.create(
+                engine=async_engine, table_name=default_table_name_async
+            ),
         )
 
         yield doc_store
@@ -132,8 +135,11 @@ class TestAsyncPostgresDocumentStore:
             async_engine._ainit_doc_store_table(table_name=custom_table_name_async),
         )
 
-        custom_doc_store = await AsyncPostgresDocumentStore.create(
-            engine=async_engine, table_name=custom_table_name_async, batch_size=0
+        custom_doc_store = await run_on_background(
+            async_engine,
+            AsyncPostgresDocumentStore.create(
+                engine=async_engine, table_name=custom_table_name_async, batch_size=0
+            ),
         )
         yield custom_doc_store
 
@@ -149,8 +155,11 @@ class TestAsyncPostgresDocumentStore:
 
     async def test_create_without_table(self, async_engine):
         with pytest.raises(ValueError):
-            await AsyncPostgresDocumentStore.create(
-                engine=async_engine, table_name="non-existent-table"
+            await run_on_background(
+                async_engine,
+                AsyncPostgresDocumentStore.create(
+                    engine=async_engine, table_name="non-existent-table"
+                ),
             )
 
     async def test_warning(self, custom_doc_store):

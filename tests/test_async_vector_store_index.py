@@ -122,9 +122,12 @@ class TestIndex:
                 DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
             ),
         )
-        vs = await AsyncPostgresVectorStore.create(
+        vs = await run_on_background(
             engine,
-            table_name=DEFAULT_TABLE,
+            AsyncPostgresVectorStore.create(
+                engine,
+                table_name=DEFAULT_TABLE,
+            ),
         )
 
         await run_on_background(engine, vs.async_add(nodes))

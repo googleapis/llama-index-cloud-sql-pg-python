@@ -114,8 +114,11 @@ class TestAsyncPostgresIndexStore:
             async_engine._ainit_index_store_table(table_name=default_table_name_async),
         )
 
-        index_store = await AsyncPostgresIndexStore.create(
-            engine=async_engine, table_name=default_table_name_async
+        index_store = await run_on_background(
+            async_engine,
+            AsyncPostgresIndexStore.create(
+                engine=async_engine, table_name=default_table_name_async
+            ),
         )
 
         yield index_store
@@ -132,8 +135,11 @@ class TestAsyncPostgresIndexStore:
 
     async def test_create_without_table(self, async_engine):
         with pytest.raises(ValueError):
-            await AsyncPostgresIndexStore.create(
-                engine=async_engine, table_name="non-existent-table"
+            await run_on_background(
+                async_engine,
+                AsyncPostgresIndexStore.create(
+                    engine=async_engine, table_name="non-existent-table"
+                ),
             )
 
     async def test_add_and_delete_index(self, index_store, async_engine):

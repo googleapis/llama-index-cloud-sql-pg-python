@@ -162,14 +162,15 @@ class TestAsyncPostgresDocumentStore:
                 ),
             )
 
-    async def test_warning(self, custom_doc_store):
+    async def test_warning(self, async_engine, custom_doc_store):
         # Create and add documents into the docstore with batch size set to 0.
         document_text = "warning test doc"
         doc = Document(
             text=document_text, id_="warning_test_doc", metadata={"doc": "info"}
         )
         with warnings.catch_warnings(record=True) as w:
-            await custom_doc_store.async_add_documents([doc], batch_size=0)
+            await run_on_background(
+            async_engine, custom_doc_store.async_add_documents([doc], batch_size=0))
 
             assert len(w) == 1
             assert "Provided batch size less than 1. Defaulting to 1." in str(
@@ -185,7 +186,9 @@ class TestAsyncPostgresDocumentStore:
         await run_on_background(async_engine, doc_store.async_add_documents([doc]))
 
         # Assert document is found using the docs property.
-        docs = await doc_store.adocs
+        docs = await run_on_background(
+            async_engine, doc_store.adocs
+        )
 
         assert doc.doc_id in docs
 

@@ -117,9 +117,10 @@ class TestAsyncPostgresChatStores:
             async_engine,
             async_engine._ainit_chat_store_table(table_name=default_table_name_async),
         )
-        chat_store = await AsyncPostgresChatStore.create(
+        chat_store = await run_on_background(
+            async_engine, AsyncPostgresChatStore.create(
             engine=async_engine, table_name=default_table_name_async
-        )
+        ))
 
         yield chat_store
 

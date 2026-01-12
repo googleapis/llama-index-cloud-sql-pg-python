@@ -191,7 +191,9 @@ class TestAsyncPostgresIndexStore:
             async_engine, index_store.aadd_index_struct(index_list_struct)
         )
 
-        indexes = await index_store.aindex_structs()
+        indexes = await run_on_background(
+            async_engine, index_store.aindex_structs()
+        )
 
         assert index_dict_struct in indexes
         assert index_list_struct in indexes

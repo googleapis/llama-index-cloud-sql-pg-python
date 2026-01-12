@@ -217,7 +217,9 @@ class TestAsyncPostgresReader:
             ),
         )
 
-        documents = await self._collect_async_items(reader.alazy_load_data())
+        documents = await run_on_background(
+            async_engine, self._collect_async_items(reader.alazy_load_data())
+        )
 
         expected_document = Document(
             text="1",
@@ -289,7 +291,9 @@ class TestAsyncPostgresReader:
             ),
         )
 
-        documents = await self._collect_async_items(reader.alazy_load_data())
+        documents = await run_on_background(
+            async_engine, self._collect_async_items(reader.alazy_load_data())
+        )
 
         # Compare the full list of documents to make sure all are in sync.
         for expected, actual in zip(expected_docs, documents):
@@ -333,7 +337,9 @@ class TestAsyncPostgresReader:
             ),
         )
 
-        documents = await self._collect_async_items(reader.alazy_load_data())
+        documents = await run_on_background(
+            async_engine, self._collect_async_items(reader.alazy_load_data())
+        )
 
         expected_text_docs = [
             Document(
@@ -360,7 +366,9 @@ class TestAsyncPostgresReader:
             ),
         )
 
-        actual_documents = await self._collect_async_items(reader.alazy_load_data())
+        actual_documents = await run_on_background(
+            async_engine, self._collect_async_items(reader.alazy_load_data())
+        )
 
         expected_docs = [
             Document(
@@ -413,7 +421,9 @@ class TestAsyncPostgresReader:
             ),
         )
 
-        documents = await self._collect_async_items(reader.alazy_load_data())
+        documents = await run_on_background(
+            async_engine, self._collect_async_items(reader.alazy_load_data())
+        )
 
         expected_docs = [
             Document(
@@ -473,7 +483,9 @@ class TestAsyncPostgresReader:
             ),
         )
 
-        documents = await self._collect_async_items(reader.alazy_load_data())
+        documents = await run_on_background(
+            async_engine, self._collect_async_items(reader.alazy_load_data())
+        )
 
         expected_documents = [
             Document(
@@ -528,7 +540,9 @@ class TestAsyncPostgresReader:
             ),
         )
 
-        documents = await self._collect_async_items(reader.alazy_load_data())
+        documents = await run_on_background(
+            async_engine, self._collect_async_items(reader.alazy_load_data())
+        )
 
         expected_docs = [
             Document(

@@ -424,8 +424,7 @@ class TestVectorStore:
             query_embedding=[1.0] * VECTOR_SIZE, filters=filters, similarity_top_k=-1
         )
         with warnings.catch_warnings(record=True) as w:
-            results = await run_on_background(
-            engine, custom_vs.aquery(query))
+            results = await run_on_background(engine, custom_vs.aquery(query))
 
             assert len(w) == 1
             assert "Expecting a scalar in the filter value" in str(w[-1].message)

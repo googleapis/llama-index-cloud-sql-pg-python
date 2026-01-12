@@ -170,7 +170,8 @@ class TestAsyncPostgresDocumentStore:
         )
         with warnings.catch_warnings(record=True) as w:
             await run_on_background(
-            async_engine, custom_doc_store.async_add_documents([doc], batch_size=0))
+                async_engine, custom_doc_store.async_add_documents([doc], batch_size=0)
+            )
 
             assert len(w) == 1
             assert "Provided batch size less than 1. Defaulting to 1." in str(
@@ -186,9 +187,7 @@ class TestAsyncPostgresDocumentStore:
         await run_on_background(async_engine, doc_store.async_add_documents([doc]))
 
         # Assert document is found using the docs property.
-        docs = await run_on_background(
-            async_engine, doc_store.adocs
-        )
+        docs = await run_on_background(async_engine, doc_store.adocs)
 
         assert doc.doc_id in docs
 

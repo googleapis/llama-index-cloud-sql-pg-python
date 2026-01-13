@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import os
 import uuid
 import warnings
-from typing import Sequence
+from typing import Any, Coroutine, Sequence
 
 import pytest
 import pytest_asyncio
@@ -60,18 +61,35 @@ def get_env_var(key: str, desc: str) -> str:
     return v
 
 
+# Helper to bridge the Main Test Loop and the Engine Background Loop
+async def run_on_background(engine: PostgresEngine, coro: Coroutine) -> Any:
+    """Runs a coroutine on the engine's background loop."""
+    if engine._loop:
+        return await asyncio.wrap_future(
+            asyncio.run_coroutine_threadsafe(coro, engine._loop)
+        )
+    return await coro
+
+
 async def aexecute(engine: PostgresEngine, query: str) -> None:
-    async with engine._pool.connect() as conn:
-        await conn.execute(text(query))
-        await conn.commit()
+    async def _impl():
+        async with engine._pool.connect() as conn:
+            await conn.execute(text(query))
+            await conn.commit()
+
+    await run_on_background(engine, _impl())
 
 
 async def afetch(engine: PostgresEngine, query: str) -> Sequence[RowMapping]:
-    async with engine._pool.connect() as conn:
-        result = await conn.execute(text(query))
-        result_map = result.mappings()
-        result_fetch = result_map.fetchall()
-    return result_fetch
+    async def _impl():
+        async with engine._pool.connect() as conn:
+            result = await conn.execute(text(query))
+            result_map = result.mappings()
+            result_fetch = result_map.fetchall()
+        return result_fetch
+
+    result = await run_on_background(engine, _impl())
+    return result
 
 
 @pytest.mark.asyncio(loop_scope="class")
@@ -116,40 +134,51 @@ class TestVectorStore:
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):
-        await engine._ainit_vector_store_table(
-            DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
+        await run_on_background(
+            engine,
+            engine._ainit_vector_store_table(
+                DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
+            ),
         )
-        vs = await AsyncPostgresVectorStore.create(engine, table_name=DEFAULT_TABLE)
+        vs = await run_on_background(
+            engine, AsyncPostgresVectorStore.create(engine, table_name=DEFAULT_TABLE)
+        )
         yield vs
 
     @pytest_asyncio.fixture(scope="class")
     async def custom_vs(self, engine):
-        await engine._ainit_vector_store_table(
-            DEFAULT_TABLE_CUSTOM_VS,
-            VECTOR_SIZE,
-            overwrite_existing=True,
-            metadata_columns=[
-                Column(name="len", data_type="INTEGER", nullable=False),
-                Column(
-                    name="nullable_int_field",
-                    data_type="INTEGER",
-                    nullable=True,
-                ),
-                Column(
-                    name="nullable_str_field",
-                    data_type="VARCHAR",
-                    nullable=True,
-                ),
-            ],
-        )
-        vs = await AsyncPostgresVectorStore.create(
+        await run_on_background(
             engine,
-            table_name=DEFAULT_TABLE_CUSTOM_VS,
-            metadata_columns=[
-                "len",
-                "nullable_int_field",
-                "nullable_str_field",
-            ],
+            engine._ainit_vector_store_table(
+                DEFAULT_TABLE_CUSTOM_VS,
+                VECTOR_SIZE,
+                overwrite_existing=True,
+                metadata_columns=[
+                    Column(name="len", data_type="INTEGER", nullable=False),
+                    Column(
+                        name="nullable_int_field",
+                        data_type="INTEGER",
+                        nullable=True,
+                    ),
+                    Column(
+                        name="nullable_str_field",
+                        data_type="VARCHAR",
+                        nullable=True,
+                    ),
+                ],
+            ),
+        )
+        vs = await run_on_background(
+            engine,
+            AsyncPostgresVectorStore.create(
+                engine,
+                table_name=DEFAULT_TABLE_CUSTOM_VS,
+                metadata_columns=[
+                    "len",
+                    "nullable_int_field",
+                    "nullable_str_field",
+                ],
+            ),
         )
         yield vs
 
@@ -163,8 +192,11 @@ class TestVectorStore:
         with pytest.raises(
             Exception, match=f"Id column, {test_id_column}, does not exist."
         ):
-            await AsyncPostgresVectorStore.create(
-                engine, table_name=DEFAULT_TABLE, id_column=test_id_column
+            await run_on_background(
+                engine,
+                AsyncPostgresVectorStore.create(
+                    engine, table_name=DEFAULT_TABLE, id_column=test_id_column
+                ),
             )
 
     async def test_validate_text_column_create(self, engine, vs):
@@ -172,8 +204,11 @@ class TestVectorStore:
         with pytest.raises(
             Exception, match=f"Text column, {test_text_column}, does not exist."
         ):
-            await AsyncPostgresVectorStore.create(
-                engine, table_name=DEFAULT_TABLE, text_column=test_text_column
+            await run_on_background(
+                engine,
+                AsyncPostgresVectorStore.create(
+                    engine, table_name=DEFAULT_TABLE, text_column=test_text_column
+                ),
             )
 
     async def test_validate_embedding_column_create(self, engine, vs):
@@ -182,10 +217,13 @@ class TestVectorStore:
             Exception,
             match=f"Embedding column, {test_embed_column}, does not exist.",
         ):
-            await AsyncPostgresVectorStore.create(
+            await run_on_background(
                 engine,
-                table_name=DEFAULT_TABLE,
-                embedding_column=test_embed_column,
+                AsyncPostgresVectorStore.create(
+                    engine,
+                    table_name=DEFAULT_TABLE,
+                    embedding_column=test_embed_column,
+                ),
             )
 
     async def test_validate_node_column_create(self, engine, vs):
@@ -193,8 +231,11 @@ class TestVectorStore:
         with pytest.raises(
             Exception, match=f"Node column, {test_node_column}, does not exist."
         ):
-            await AsyncPostgresVectorStore.create(
-                engine, table_name=DEFAULT_TABLE, node_column=test_node_column
+            await run_on_background(
+                engine,
+                AsyncPostgresVectorStore.create(
+                    engine, table_name=DEFAULT_TABLE, node_column=test_node_column
+                ),
             )
 
     async def test_validate_ref_doc_id_column_create(self, engine, vs):
@@ -203,10 +244,13 @@ class TestVectorStore:
             Exception,
             match=f"Reference Document Id column, {test_ref_doc_id_column}, does not exist.",
         ):
-            await AsyncPostgresVectorStore.create(
+            await run_on_background(
                 engine,
-                table_name=DEFAULT_TABLE,
-                ref_doc_id_column=test_ref_doc_id_column,
+                AsyncPostgresVectorStore.create(
+                    engine,
+                    table_name=DEFAULT_TABLE,
+                    ref_doc_id_column=test_ref_doc_id_column,
+                ),
             )
 
     async def test_validate_metadata_json_column_create(self, engine, vs):
@@ -215,14 +259,17 @@ class TestVectorStore:
             Exception,
             match=f"Metadata column, {test_metadata_json_column}, does not exist.",
         ):
-            await AsyncPostgresVectorStore.create(
+            await run_on_background(
                 engine,
-                table_name=DEFAULT_TABLE,
-                metadata_json_column=test_metadata_json_column,
+                AsyncPostgresVectorStore.create(
+                    engine,
+                    table_name=DEFAULT_TABLE,
+                    metadata_json_column=test_metadata_json_column,
+                ),
             )
 
     async def test_async_add(self, engine, vs):
-        await vs.async_add(nodes)
+        await run_on_background(engine, vs.async_add(nodes))
 
         results = await afetch(engine, f'SELECT * FROM "{DEFAULT_TABLE}"')
         assert len(results) == 4
@@ -232,7 +279,7 @@ class TestVectorStore:
         for node in nodes:
             node.metadata["len"] = len(node.text)
 
-        await custom_vs.async_add(nodes)
+        await run_on_background(engine, custom_vs.async_add(nodes))
 
         results = await afetch(engine, f'SELECT * FROM "{DEFAULT_TABLE_CUSTOM_VS}"')
         assert len(results) == 4
@@ -244,8 +291,8 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_async_add
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
-        await vs.adelete(nodes[0].node_id)
+        await run_on_background(engine, vs.async_add(nodes))
+        await run_on_background(engine, vs.adelete(nodes[0].node_id))
 
         results = await afetch(engine, f'SELECT * FROM "{DEFAULT_TABLE}"')
         assert len(results) == 3
@@ -254,19 +301,24 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_async_add
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
-        await vs.adelete_nodes(
-            node_ids=[nodes[0].node_id, nodes[1].node_id],
-            filters=MetadataFilters(
-                filters=[
-                    MetadataFilter(
-                        key="text",
-                        value="foo",
-                        operator=FilterOperator.TEXT_MATCH,
-                    ),
-                    MetadataFilter(key="text", value="bar", operator=FilterOperator.EQ),
-                ],
-                condition=FilterCondition.OR,
+        await run_on_background(engine, vs.async_add(nodes))
+        await run_on_background(
+            engine,
+            vs.adelete_nodes(
+                node_ids=[nodes[0].node_id, nodes[1].node_id],
+                filters=MetadataFilters(
+                    filters=[
+                        MetadataFilter(
+                            key="text",
+                            value="foo",
+                            operator=FilterOperator.TEXT_MATCH,
+                        ),
+                        MetadataFilter(
+                            key="text", value="bar", operator=FilterOperator.EQ
+                        ),
+                    ],
+                    condition=FilterCondition.OR,
+                ),
             ),
         )
 
@@ -277,23 +329,26 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_async_add
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
-        results = await vs.aget_nodes(
-            filters=MetadataFilters(
-                filters=[
-                    MetadataFilter(
-                        key="text",
-                        value="foo",
-                        operator=FilterOperator.TEXT_MATCH,
-                    ),
-                    MetadataFilter(
-                        key="text",
-                        value="bar",
-                        operator=FilterOperator.TEXT_MATCH,
-                    ),
-                ],
-                condition=FilterCondition.AND,
-            )
+        await run_on_background(engine, vs.async_add(nodes))
+        results = await run_on_background(
+            engine,
+            vs.aget_nodes(
+                filters=MetadataFilters(
+                    filters=[
+                        MetadataFilter(
+                            key="text",
+                            value="foo",
+                            operator=FilterOperator.TEXT_MATCH,
+                        ),
+                        MetadataFilter(
+                            key="text",
+                            value="bar",
+                            operator=FilterOperator.TEXT_MATCH,
+                        ),
+                    ],
+                    condition=FilterCondition.AND,
+                )
+            ),
         )
 
         assert len(results) == 1
@@ -303,11 +358,11 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_async_add
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
+        await run_on_background(engine, vs.async_add(nodes))
         query = VectorStoreQuery(
             query_embedding=[1.0] * VECTOR_SIZE, similarity_top_k=3
         )
-        results = await vs.aquery(query)
+        results = await run_on_background(engine, vs.aquery(query))
 
         assert results.nodes is not None
         assert results.ids is not None
@@ -323,7 +378,7 @@ class TestVectorStore:
         for node in nodes:
             node.metadata["len"] = len(node.text)
 
-        await custom_vs.async_add(nodes)
+        await run_on_background(engine, custom_vs.async_add(nodes))
 
         filters = MetadataFilters(
             filters=[
@@ -369,7 +424,7 @@ class TestVectorStore:
             query_embedding=[1.0] * VECTOR_SIZE, filters=filters, similarity_top_k=-1
         )
         with warnings.catch_warnings(record=True) as w:
-            results = await custom_vs.aquery(query)
+            results = await run_on_background(engine, custom_vs.aquery(query))
 
             assert len(w) == 1
             assert "Expecting a scalar in the filter value" in str(w[-1].message)
@@ -383,8 +438,8 @@ class TestVectorStore:
         # Note: To be migrated to a pytest dependency on test_adelete
         # Blocked due to unexpected fixtures reloads while running integration test suite
         await aexecute(engine, f'TRUNCATE TABLE "{DEFAULT_TABLE}"')
-        await vs.async_add(nodes)
-        await vs.aclear()
+        await run_on_background(engine, vs.async_add(nodes))
+        await run_on_background(engine, vs.aclear())
 
         results = await afetch(engine, f'SELECT * FROM "{DEFAULT_TABLE}"')
         assert len(results) == 0

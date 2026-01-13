@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import asyncio
 import os
 import uuid
+from typing import Any, Coroutine
 
 import pytest
 import pytest_asyncio
 from llama_index.core.schema import TextNode
 from sqlalchemy import text
 
-from llama_index_cloud_sql_pg import PostgresEngine
+from llama_index_cloud_sql_pg import PostgresEngine, engine
 from llama_index_cloud_sql_pg.async_vector_store import AsyncPostgresVectorStore
 from llama_index_cloud_sql_pg.indexes import (
     DEFAULT_INDEX_NAME_SUFFIX,
@@ -56,10 +57,23 @@ def get_env_var(key: str, desc: str) -> str:
     return v
 
 
+# Helper to bridge the Main Test Loop and the Engine Background Loop
+async def run_on_background(engine: PostgresEngine, coro: Coroutine) -> Any:
+    """Runs a coroutine on the engine's background loop."""
+    if engine._loop:
+        return await asyncio.wrap_future(
+            asyncio.run_coroutine_threadsafe(coro, engine._loop)
+        )
+    return await coro
+
+
 async def aexecute(engine: PostgresEngine, query: str) -> None:
-    async with engine._pool.connect() as conn:
-        await conn.execute(text(query))
-        await conn.commit()
+    async def _impl():
+        async with engine._pool.connect() as conn:
+            await conn.execute(text(query))
+            await conn.commit()
+
+    await run_on_background(engine, _impl())
 
 
 @pytest.mark.asyncio(loop_scope="class")
@@ -102,51 +116,59 @@ class TestIndex:
 
     @pytest_asyncio.fixture(scope="class")
     async def vs(self, engine):
-        await engine._ainit_vector_store_table(
-            DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
-        )
-        vs = await AsyncPostgresVectorStore.create(
+        await run_on_background(
             engine,
-            table_name=DEFAULT_TABLE,
+            engine._ainit_vector_store_table(
+                DEFAULT_TABLE, VECTOR_SIZE, overwrite_existing=True
+            ),
+        )
+        vs = await run_on_background(
+            engine,
+            AsyncPostgresVectorStore.create(
+                engine,
+                table_name=DEFAULT_TABLE,
+            ),
         )
 
-        await vs.async_add(nodes)
-        await vs.adrop_vector_index()
+        await run_on_background(engine, vs.async_add(nodes))
+        await run_on_background(engine, vs.adrop_vector_index())
         yield vs
 
-    async def test_aapply_vector_index(self, vs):
+    async def test_aapply_vector_index(self, vs, engine):
         index = HNSWIndex()
-        await vs.aapply_vector_index(index)
-        assert await vs.is_valid_index(DEFAULT_INDEX_NAME)
-        await vs.adrop_vector_index(DEFAULT_INDEX_NAME)
+        await run_on_background(engine, vs.aapply_vector_index(index))
+        assert await run_on_background(engine, vs.is_valid_index(DEFAULT_INDEX_NAME))
+        await run_on_background(engine, vs.adrop_vector_index(DEFAULT_INDEX_NAME))
 
-    async def test_areindex(self, vs):
-        if not await vs.is_valid_index(DEFAULT_INDEX_NAME):
+    async def test_areindex(self, vs, engine):
+        if not await run_on_background(engine, vs.is_valid_index(DEFAULT_INDEX_NAME)):
             index = HNSWIndex()
-            await vs.aapply_vector_index(index)
-        await vs.areindex()
-        await vs.areindex(DEFAULT_INDEX_NAME)
-        assert await vs.is_valid_index(DEFAULT_INDEX_NAME)
-        await vs.adrop_vector_index()
+            await run_on_background(engine, vs.aapply_vector_index(index))
+        await run_on_background(engine, vs.areindex())
+        await run_on_background(engine, vs.areindex(DEFAULT_INDEX_NAME))
+        assert await run_on_background(engine, vs.is_valid_index(DEFAULT_INDEX_NAME))
+        await run_on_background(engine, vs.adrop_vector_index())
 
-    async def test_dropindex(self, vs):
-        await vs.adrop_vector_index()
-        result = await vs.is_valid_index(DEFAULT_INDEX_NAME)
+    async def test_dropindex(self, vs, engine):
+        await run_on_background(engine, vs.adrop_vector_index())
+        result = await run_on_background(engine, vs.is_valid_index(DEFAULT_INDEX_NAME))
         assert not result
 
-    async def test_aapply_vector_index_ivfflat(self, vs):
+    async def test_aapply_vector_index_ivfflat(self, vs, engine):
         index = IVFFlatIndex(distance_strategy=DistanceStrategy.EUCLIDEAN)
-        await vs.aapply_vector_index(index, concurrently=True)
-        assert await vs.is_valid_index(DEFAULT_INDEX_NAME)
+        await run_on_background(
+            engine, vs.aapply_vector_index(index, concurrently=True)
+        )
+        assert await run_on_background(engine, vs.is_valid_index(DEFAULT_INDEX_NAME))
         index = IVFFlatIndex(
             name="secondindex",
             distance_strategy=DistanceStrategy.INNER_PRODUCT,
         )
-        await vs.aapply_vector_index(index)
-        assert await vs.is_valid_index("secondindex")
-        await vs.adrop_vector_index()
-        await vs.adrop_vector_index("secondindex")
+        await run_on_background(engine, vs.aapply_vector_index(index))
+        assert await run_on_background(engine, vs.is_valid_index("secondindex"))
+        await run_on_background(engine, vs.adrop_vector_index())
+        await run_on_background(engine, vs.adrop_vector_index("secondindex"))
 
-    async def test_is_valid_index(self, vs):
-        is_valid = await vs.is_valid_index("invalid_index")
+    async def test_is_valid_index(self, vs, engine):
+        is_valid = await run_on_background(engine, vs.is_valid_index("invalid_index"))
         assert is_valid == False

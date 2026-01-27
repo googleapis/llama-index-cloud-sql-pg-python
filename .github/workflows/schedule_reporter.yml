@@ -24,6 +24,6 @@ jobs:
       issues: 'write'
       checks: 'read'
       contents: 'read'
-    uses: googleapis/langchain-google-alloydb-pg-python/.github/workflows/cloud_build_failure_reporter.yml@fe6ffceffe08e92cafc109d7befbda16081fb4c5
+    uses: googleapis/langchain-google-alloydb-pg-python/.github/workflows/cloud_build_failure_reporter.yml@d3f9b761aa012fa1b98cf23d01895d53b2d614c4
     with:
       trigger_names: "integration-test-nightly,continuous-test-on-merge"

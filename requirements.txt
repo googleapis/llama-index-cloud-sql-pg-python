@@ -1,4 +1,4 @@
 cloud-sql-python-connector[asyncpg]==1.20.0
-llama-index-core==0.14.13
+llama-index-core==0.14.14
 pgvector==0.4.2
 SQLAlchemy[asyncio]==2.0.46

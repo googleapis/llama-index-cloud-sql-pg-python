@@ -3,4 +3,4 @@
 # For syntax help see:
 # https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
 
-* @googleapis/senseai-eco  @googleapis/llama-index-cloud-sql
+* @googleapis/senseai-eco-team  @googleapis/llama-index-cloud-sql-team

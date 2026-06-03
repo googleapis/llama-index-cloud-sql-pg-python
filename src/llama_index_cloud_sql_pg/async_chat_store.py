@@ -104,9 +104,9 @@ class AsyncPostgresChatStore(BaseChatStore):
             await conn.execute(text(query), params)
             await conn.commit()
 
-    async def __afetch_query(self, query):
+    async def __afetch_query(self, query, params=None):
         async with self._engine.connect() as conn:
-            result = await conn.execute(text(query))
+            result = await conn.execute(text(query), params)
             result_map = result.mappings()
             results = result_map.fetchall()
             await conn.commit()
@@ -128,8 +128,9 @@ class AsyncPostgresChatStore(BaseChatStore):
             None
 
         """
-        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE key = '{key}'; """
-        await self.__aexecute_query(query)
+        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE key = :key; """
+        params = {"key": key}
+        await self.__aexecute_query(query, params)
         insert_query = f"""
                 INSERT INTO "{self._schema_name}"."{self._table_name}" (key, message)
                 VALUES (:key, :message);"""
@@ -154,8 +155,9 @@ class AsyncPostgresChatStore(BaseChatStore):
             List[ChatMessage]: A list of `ChatMessage` objects associated with the provided key.
             If no messages are found, an empty list is returned.
         """
-        query = f"""SELECT message from "{self._schema_name}"."{self._table_name}" WHERE key = '{key}' ORDER BY id;"""
-        results = await self.__afetch_query(query)
+        query = f"""SELECT message from "{self._schema_name}"."{self._table_name}" WHERE key = :key ORDER BY id;"""
+        params = {"key": key}
+        results = await self.__afetch_query(query, params)
         if results:
             return [
                 ChatMessage.model_validate(result.get("message")) for result in results
@@ -189,8 +191,9 @@ class AsyncPostgresChatStore(BaseChatStore):
             Optional[List[ChatMessage]]: A list of `ChatMessage` objects that were deleted, or `None` if no messages
             were associated with the key or could be deleted.
         """
-        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE key = '{key}' RETURNING *; """
-        results = await self.__afetch_query(query)
+        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE key = :key RETURNING *; """
+        params = {"key": key}
+        results = await self.__afetch_query(query, params)
         if results:
             return [
                 ChatMessage.model_validate(result.get("message")) for result in results
@@ -208,14 +211,16 @@ class AsyncPostgresChatStore(BaseChatStore):
             Optional[ChatMessage]: The `ChatMessage` object that was deleted, or `None` if no message
             was associated with the key or could be deleted.
         """
-        query = f"""SELECT * from "{self._schema_name}"."{self._table_name}" WHERE key = '{key}' ORDER BY id;"""
-        results = await self.__afetch_query(query)
+        query = f"""SELECT * from "{self._schema_name}"."{self._table_name}" WHERE key = :key ORDER BY id;"""
+        params = {"key": key}
+        results = await self.__afetch_query(query, params)
         if results:
             if idx >= len(results):
                 return None
             id_to_be_deleted = results[idx].get("id")
-            delete_query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE id = '{id_to_be_deleted}' RETURNING *;"""
-            result = await self.__afetch_query(delete_query)
+            delete_query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE id = :id_to_be_deleted RETURNING *;"""
+            delete_params = {"id_to_be_deleted": id_to_be_deleted}
+            result = await self.__afetch_query(delete_query, delete_params)
             result = result[0]
             if result:
                 return ChatMessage.model_validate(result.get("message"))
@@ -232,12 +237,14 @@ class AsyncPostgresChatStore(BaseChatStore):
             Optional[ChatMessage]: The `ChatMessage` object that was deleted, or `None` if no message
             was associated with the key or could be deleted.
         """
-        query = f"""SELECT * from "{self._schema_name}"."{self._table_name}" WHERE key = '{key}' ORDER BY id DESC LIMIT 1;"""
-        results = await self.__afetch_query(query)
+        query = f"""SELECT * from "{self._schema_name}"."{self._table_name}" WHERE key = :key ORDER BY id DESC LIMIT 1;"""
+        params = {"key": key}
+        results = await self.__afetch_query(query, params)
         if results:
             id_to_be_deleted = results[0].get("id")
-            delete_query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE id = '{id_to_be_deleted}' RETURNING *;"""
-            result = await self.__afetch_query(delete_query)
+            delete_query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE id = :id_to_be_deleted RETURNING *;"""
+            delete_params = {"id_to_be_deleted": id_to_be_deleted}
+            result = await self.__afetch_query(delete_query, delete_params)
             result = result[0]
             if result:
                 return ChatMessage.model_validate(result.get("message"))

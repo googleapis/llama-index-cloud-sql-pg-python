@@ -155,9 +155,10 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
         Returns:
             AsyncPostgresVectorStore
         """
-        stmt = f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{table_name}' AND table_schema = '{schema_name}'"
+        stmt = f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = :table_name AND table_schema = :schema_name"
+        params = {"table_name": table_name, "schema_name": schema_name}
         async with engine._pool.connect() as conn:
-            result = await conn.execute(text(stmt))
+            result = await conn.execute(text(stmt), params)
             result_map = result.mappings()
             results = result_map.fetchall()
         columns = {}
@@ -280,9 +281,10 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
 
     async def adelete(self, ref_doc_id: str, **delete_kwargs: Any) -> None:
         """Asynchronously delete nodes belonging to provided parent document from the table."""
-        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE {self._ref_doc_id_column} = '{ref_doc_id}'"""
+        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE {self._ref_doc_id_column} = :ref_doc_id;"""
+        params = {"ref_doc_id": ref_doc_id}
         async with self._engine.connect() as conn:
-            await conn.execute(text(query))
+            await conn.execute(text(query), params)
             await conn.commit()
 
     async def adelete_nodes(
@@ -467,10 +469,11 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
         query = f"""
         SELECT tablename, indexname
         FROM pg_indexes
-        WHERE tablename = '{self._table_name}' AND schemaname = '{self._schema_name}' AND indexname = '{index_name}';
+        WHERE tablename = :table_name AND schemaname = :schema_name AND indexname = :index_name;
         """
+        params = {"table_name": self._table_name, "schema_name": self._schema_name, "index_name": index_name}
         async with self._engine.connect() as conn:
-            result = await conn.execute(text(query))
+            result = await conn.execute(text(query), params)
             result_map = result.mappings()
             results = result_map.fetchall()
         return bool(len(results) == 1)

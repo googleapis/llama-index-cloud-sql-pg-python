@@ -110,9 +110,9 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
             await conn.commit()
         return None
 
-    async def __afetch_query(self, query):
+    async def __afetch_query(self, query, params=None):
         async with self._engine.connect() as conn:
-            result = await conn.execute(text(query))
+            result = await conn.execute(text(query), params)
             result_map = result.mappings()
             results = result_map.fetchall()
             await conn.commit()
@@ -159,8 +159,9 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         Returns:
             List of deleted rows.
         """
-        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE id = '{id}' RETURNING *; """
-        result = await self.__afetch_query(query)
+        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE id = :id RETURNING *; """
+        params = {"id": id}
+        result = await self.__afetch_query(query, params)
         return result
 
     async def async_add_documents(
@@ -254,8 +255,9 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         Returns:
             Optional[BaseNode]: Returns a `BaseNode` object if the document is found
         """
-        query = f"""SELECT node_data from "{self._schema_name}"."{self._table_name}" WHERE id = '{doc_id}';"""
-        result = await self.__afetch_query(query)
+        query = f"""SELECT node_data from "{self._schema_name}"."{self._table_name}" WHERE id = :doc_id;"""
+        params = {"doc_id": doc_id}
+        result = await self.__afetch_query(query, params)
 
         if result:
             result = result[0]
@@ -276,9 +278,10 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         Returns:
             Optional[RefDocInfo]: Returns a `RefDocInfo` object if it exists.
         """
-        query = f"""select id, node_data from "{self._schema_name}"."{self._table_name}" where ref_doc_id = '{ref_doc_id}'"""
+        query = f"""select id, node_data from "{self._schema_name}"."{self._table_name}" where ref_doc_id = :ref_doc_id"""
+        params = {"ref_doc_id": ref_doc_id}
 
-        rows = await self.__afetch_query(query)
+        rows = await self.__afetch_query(query, params)
         node_ids = []
         merged_metadata = {}
 
@@ -350,8 +353,9 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
         Returns:
             bool : True if document exists in the table.
         """
-        query = f"""SELECT id from "{self._schema_name}"."{self._table_name}" WHERE id = '{doc_id}' LIMIT 1;"""
-        result = await self.__afetch_query(query)
+        query = f"""SELECT id from "{self._schema_name}"."{self._table_name}" WHERE id = :doc_id LIMIT 1;"""
+        params = {"doc_id": doc_id}
+        result = await self.__afetch_query(query, params)
         return bool(result)
 
     async def _get_ref_doc_child_node_ids(
@@ -366,8 +370,9 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
                 list    # List of all nodes that refer to ref_doc_id
               ]
             ]"""
-        query = f"""select id from "{self._schema_name}"."{self._table_name}" where ref_doc_id = '{ref_doc_id}';"""
-        results = await self.__afetch_query(query)
+        query = f"""select id from "{self._schema_name}"."{self._table_name}" where ref_doc_id = :ref_doc_id;"""
+        params = {"ref_doc_id": ref_doc_id}
+        results = await self.__afetch_query(query, params)
         result = {"node_ids": [item["id"] for item in results]}
         return result
 
@@ -423,7 +428,8 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
                 return
 
         query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE ref_doc_id = :ref_doc_id;"""
-        await self.__aexecute_query(query, {"ref_doc_id": ref_doc_id})
+        params = {"ref_doc_id": ref_doc_id}
+        await self.__aexecute_query(query, params)
 
         await self._delete_from_table(ref_doc_id)
 
@@ -465,8 +471,9 @@ class AsyncPostgresDocumentStore(BaseDocumentStore):
               str   # hash for the given doc_id
             ]
         """
-        query = f"""SELECT id, doc_hash from "{self._schema_name}"."{self._table_name}" WHERE id = '{doc_id}' LIMIT 1;"""
-        row = await self.__afetch_query(query)
+        query = f"""SELECT id, doc_hash from "{self._schema_name}"."{self._table_name}" WHERE id = :doc_id LIMIT 1;"""
+        params = {"doc_id": doc_id}
+        row = await self.__afetch_query(query, params)
 
         if row:
             return row[0].get("doc_hash", None)

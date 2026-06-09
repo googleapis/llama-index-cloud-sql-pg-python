@@ -471,7 +471,11 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
         FROM pg_indexes
         WHERE tablename = :table_name AND schemaname = :schema_name AND indexname = :index_name;
         """
-        params = {"table_name": self._table_name, "schema_name": self._schema_name, "index_name": index_name}
+        params = {
+            "table_name": self._table_name,
+            "schema_name": self._schema_name,
+            "index_name": index_name,
+        }
         async with self._engine.connect() as conn:
             result = await conn.execute(text(query), params)
             result_map = result.mappings()

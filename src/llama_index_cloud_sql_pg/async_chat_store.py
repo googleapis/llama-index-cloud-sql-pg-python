@@ -128,9 +128,9 @@ class AsyncPostgresChatStore(BaseChatStore):
             None
 
         """
-        query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE key = :key; """
-        params = {"key": key}
-        await self.__aexecute_query(query, params)
+        delete_query = f"""DELETE FROM "{self._schema_name}"."{self._table_name}" WHERE key = :key; """
+        delete_params = {"key": key}
+        await self.__aexecute_query(delete_query, delete_params)
         insert_query = f"""
                 INSERT INTO "{self._schema_name}"."{self._table_name}" (key, message)
                 VALUES (:key, :message);"""

@@ -306,17 +306,18 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
         if filters:
             all_filters.append(filters)
         filters_stmt = ""
+        bind_params: dict[str, Any] = {}
         if all_filters:
             all_metadata_filters = MetadataFilters(
                 filters=all_filters, condition=FilterCondition.AND
             )
             filters_stmt = self.__parse_metadata_filters_recursively(
-                all_metadata_filters
+                all_metadata_filters, bind_params
             )
         filters_stmt = f"WHERE {filters_stmt}" if filters_stmt else ""
         query = f'DELETE FROM "{self._schema_name}"."{self._table_name}" {filters_stmt}'
         async with self._engine.connect() as conn:
-            await conn.execute(text(query))
+            await conn.execute(text(query), bind_params)
             await conn.commit()
 
     async def aclear(self) -> None:
@@ -514,24 +515,24 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
         # Vectors are already stored `self._embedding_column` so a custom embedding_field is ignored.
         query_filters = MetadataFilters(filters=filters, condition=FilterCondition.AND)
 
-        filters_stmt = self.__parse_metadata_filters_recursively(query_filters)
+        bind_params: dict[str, Any] = {}
+        filters_stmt = self.__parse_metadata_filters_recursively(
+            query_filters, bind_params
+        )
         filters_stmt = f"WHERE {filters_stmt}" if filters_stmt else ""
         operator = self._distance_strategy.operator
         search_function = self._distance_strategy.search_function
 
         # query_embedding is used for scoring
-        scoring_stmt = (
-            f", {search_function}({self._embedding_column}, '{query.query_embedding}') as distance"
-            if query.query_embedding
-            else ""
-        )
-
-        # results are sorted on ORDER BY query_embedding
-        order_stmt = (
-            f" ORDER BY {self._embedding_column} {operator} '{query.query_embedding}' "
-            if query.query_embedding
-            else ""
-        )
+        if query.query_embedding:
+            bind_params["query_embedding"] = str(query.query_embedding)
+            scoring_stmt = f", {search_function}({self._embedding_column}, :query_embedding) as distance"
+            order_stmt = (
+                f" ORDER BY {self._embedding_column} {operator} :query_embedding "
+            )
+        else:
+            scoring_stmt = ""
+            order_stmt = ""
 
         # similarity_top_k is used for limiting number of retrieved nodes
         limit_stmt = (
@@ -557,13 +558,13 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
                     f"SET LOCAL {self._index_query_options.to_string()};"
                 )
                 await conn.execute(text(query_options_stmt))
-            result = await conn.execute(text(query_stmt))
+            result = await conn.execute(text(query_stmt), bind_params)
             result_map = result.mappings()
             results = result_map.fetchall()
         return results
 
     def __parse_metadata_filters_recursively(
-        self, metadata_filters: MetadataFilters
+        self, metadata_filters: MetadataFilters, bind_params: dict[str, Any]
     ) -> str:
         """
         Parses a MetadataFilters object into a SQL WHERE clause.
@@ -575,12 +576,14 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
         where_clauses = []
         for filter_item in metadata_filters.filters:
             if isinstance(filter_item, MetadataFilter):
-                clause = self.__parse_metadata_filter(filter_item)
+                clause = self.__parse_metadata_filter(filter_item, bind_params)
                 if clause:
                     where_clauses.append(clause)
             elif isinstance(filter_item, MetadataFilters):
                 # Handle nested filters recursively
-                nested_clause = self.__parse_metadata_filters_recursively(filter_item)
+                nested_clause = self.__parse_metadata_filters_recursively(
+                    filter_item, bind_params
+                )
                 if nested_clause:
                     where_clauses.append(f"({nested_clause})")
 
@@ -592,9 +595,12 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
         )
         return f" {condition_value} ".join(where_clauses) if where_clauses else ""
 
-    def __parse_metadata_filter(self, filter: MetadataFilter) -> str:
+    def __parse_metadata_filter(
+        self, filter: MetadataFilter, bind_params: dict[str, Any]
+    ) -> str:
         key = self.__to_postgres_key(filter.key)
         op = self.__to_postgres_operator(filter.operator)
+        param_name = f"param_{len(bind_params)}"
         if filter.operator == FilterOperator.IS_EMPTY:
             # checks for emptiness of a field, so value is ignored
             # cast to jsonb to check array length
@@ -611,9 +617,11 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
                     Value -> '{filter.value}'"""
                 )
                 return ""
-            return f"({key})::jsonb {op} '[\"{filter.value}\"]' "
+            bind_params[param_name] = f'["{filter.value}"]'
+            return f"({key})::jsonb {op} :{param_name} "
         if filter.operator == FilterOperator.TEXT_MATCH:
-            return f"{key} {op} '%{filter.value}%' "
+            bind_params[param_name] = f"%{filter.value}%"
+            return f"{key} {op} :{param_name} "
         if filter.operator in [
             FilterOperator.ANY,
             FilterOperator.ALL,
@@ -631,7 +639,17 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
                     Value -> '{filter.value}'"""
                 )
                 return ""
-            filter_value = ", ".join(f"'{e}'" for e in filter.value)
+            param_names = []
+            for i, e in enumerate(filter.value):
+                p_name = f"{param_name}_{i}"
+                bind_params[p_name] = (
+                    str(e)
+                    if filter.operator in [FilterOperator.ANY, FilterOperator.ALL]
+                    else e
+                )
+                param_names.append(f":{p_name}")
+            filter_value = ", ".join(param_names)
+
             if filter.operator in [FilterOperator.ANY, FilterOperator.ALL]:
                 return f"({key})::jsonb {op} (ARRAY[{filter_value}])"
             else:
@@ -639,13 +657,15 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
 
         # Check if value is a number. If so, cast the metadata value to a float
         # This is necessary because the metadata is stored as a string.
+        bind_params[param_name] = filter.value
         if isinstance(filter.value, (int, float, str)):
             try:
-                return f"{key}::float {op} {float(filter.value)}"
+                float(filter.value)
+                return f"{key}::float {op} :{param_name}"
             except ValueError:
                 # If not a number, then treat it as a string
                 pass
-        return f"{key} {op} '{filter.value}'"
+        return f"{key} {op} :{param_name}"
 
     def __to_postgres_operator(self, operator: FilterOperator) -> str:
         if operator == FilterOperator.EQ:

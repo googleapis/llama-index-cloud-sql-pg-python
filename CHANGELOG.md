@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.3.0...v0.3.1) (2026-08-17)
+
+
+### Bug Fixes
+
+* Fix vulerability by using query parameters instead of string formatting ([#217](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/217)) ([a06cc12](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/a06cc1219d52e157dd927585079e5d139fdc1694))
+
 ## [0.3.0](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.2.3...v0.3.0) (2026-01-13)
 
 

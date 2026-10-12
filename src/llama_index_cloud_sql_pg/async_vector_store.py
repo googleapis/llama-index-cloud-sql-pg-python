@@ -598,7 +598,7 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
     def __parse_metadata_filter(
         self, filter: MetadataFilter, bind_params: dict[str, Any]
     ) -> str:
-        key = self.__to_postgres_key(filter.key)
+        key = self.__to_postgres_key(filter.key, bind_params)
         op = self.__to_postgres_operator(filter.operator)
         param_name = f"param_{len(bind_params)}"
         if filter.operator == FilterOperator.IS_EMPTY:
@@ -617,7 +617,7 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
                     Value -> '{filter.value}'"""
                 )
                 return ""
-            bind_params[param_name] = f'["{filter.value}"]'
+            bind_params[param_name] = json.dumps([filter.value])
             return f"({key})::jsonb {op} :{param_name} "
         if filter.operator == FilterOperator.TEXT_MATCH:
             bind_params[param_name] = f"%{filter.value}%"
@@ -698,12 +698,14 @@ class AsyncPostgresVectorStore(BasePydanticVectorStore):
             warnings.warn(f"Unknown operator: {operator}, fallback to '='")
             return "="
 
-    def __to_postgres_key(self, key: str) -> str:
+    def __to_postgres_key(self, key: str, bind_params: dict[str, Any]) -> str:
         if key in [
             *self._metadata_columns,
             self._id_column,
             self._ref_doc_id_column,
             self._text_column,
         ]:
-            return key
-        return f"{self._metadata_json_column}->>'{key}'"
+            return f'"{key}"'
+        key_param = f"key_{len(bind_params)}"
+        bind_params[key_param] = key
+        return f"{self._metadata_json_column}->>:{key_param}"

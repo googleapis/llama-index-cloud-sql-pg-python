@@ -506,7 +506,7 @@ class TestVectorStore:
         assert injected_value not in clause
         assert (
             clause
-            == 'li_metadata->>:key_0 = :param_1 AND "len"::float = :param_2 AND (li_metadata->>:key_3)::jsonb @> :param_4 '
+            == 'li_metadata->>:key_0 = :param_1 and "len"::float = :param_2 and (li_metadata->>:key_3)::jsonb @> :param_4 '
         )
         assert bind_params == {
             "key_0": injected_key,

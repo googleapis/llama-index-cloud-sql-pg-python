@@ -516,7 +516,5 @@ class TestVectorStore:
             "param_4": '["a\\"b"]',
         }
 
-        results = await run_on_background(
-            engine, custom_vs.aget_nodes(filters=filters)
-        )
+        results = await run_on_background(engine, custom_vs.aget_nodes(filters=filters))
         assert len(results) == 0

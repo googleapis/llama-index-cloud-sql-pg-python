@@ -13,7 +13,8 @@ dependencies = [
     "cloud-sql-python-connector[asyncpg] >= 1.10.0, <2.0.0",
     "llama-index-core>=0.12.0, <1.0.0",
     "pgvector>=0.2.5, <1.0.0",
-    "SQLAlchemy[asyncio]>=2.0.25, <3.0.0"
+    "SQLAlchemy[asyncio]>=2.0.25, <2.1.0; python_version < '3.11'",
+    "SQLAlchemy[asyncio]>=2.1.0, <3.0.0; python_version >= '3.11'"
 ]
 
 classifiers = [

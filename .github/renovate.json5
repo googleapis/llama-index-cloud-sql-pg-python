@@ -66,6 +66,39 @@
         "minor",
         "patch"
       ],
+    },
+    // ---------------------------------------------------------
+    // SQLAlchemy: Python 3.10 Compatibility Branch
+    // ---------------------------------------------------------
+    {
+      "description": "Cap SQLAlchemy 3.10 branch in pyproject.toml",
+      "matchFileNames": ["pyproject.toml"],
+      "matchPackageNames": ["SQLAlchemy", "sqlalchemy"],
+      "matchCurrentValue": ">=2.0.25, <2.1.0",
+      "allowedVersions": "<2.1.0"
+    },
+    {
+      "description": "Cap SQLAlchemy 3.10 branch in requirements.txt",
+      "matchFileNames": ["requirements.txt"],
+      "matchPackageNames": ["SQLAlchemy", "sqlalchemy"],
+      "matchCurrentValue": "==2.0.52",
+      "allowedVersions": "<2.1.0"
+    },
+
+    // ---------------------------------------------------------
+    // SQLAlchemy: Python 3.11+ Branch
+    // ---------------------------------------------------------
+    {
+      "description": "Allow standard SQLAlchemy updates for 3.11+ in pyproject.toml",
+      "matchFileNames": ["pyproject.toml"],
+      "matchPackageNames": ["SQLAlchemy", "sqlalchemy"],
+      "matchCurrentValue": ">=2.1.0, <3.0.0"
+    },
+    {
+      "description": "Allow standard SQLAlchemy updates for 3.11+ in requirements.txt",
+      "matchFileNames": ["requirements.txt"],
+      "matchPackageNames": ["SQLAlchemy", "sqlalchemy"],
+      "matchCurrentValue": "==2.1.4"
     }
   ],
 }

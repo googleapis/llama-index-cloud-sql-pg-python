@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.3.1...v0.3.2) (2026-10-22)
+
+
+### Bug Fixes
+
+* Parameterize metadata filter keys in AsyncPostgresVectorStore ([#224](https://github.com/googleapis/llama-index-cloud-sql-pg-python/issues/224)) ([e517fe5](https://github.com/googleapis/llama-index-cloud-sql-pg-python/commit/e517fe5fd39a77700d0a374a5446fb46f1dcf8c4))
+
 ## [0.3.1](https://github.com/googleapis/llama-index-cloud-sql-pg-python/compare/v0.3.0...v0.3.1) (2026-08-17)
 
 

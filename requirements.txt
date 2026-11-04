@@ -1,4 +1,5 @@
-cloud-sql-python-connector[asyncpg]==1.23.0
+cloud-sql-python-connector[asyncpg]==1.22.0; python_version < '3.11'
+cloud-sql-python-connector[asyncpg]==1.23.0; python_version >= '3.11'
 llama-index-core==0.14.25
 pgvector==0.5.1
 SQLAlchemy[asyncio]==2.0.52; python_version < '3.11'
